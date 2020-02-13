@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <group>
+
+        <item
+            android:id="@+id/view_on_reddit"
+            android:title="@string/view_on_reddit"
+            app:showAsAction="never"
+            android:orderInCategory="1"/>
+
+        <item
+            android:id="@+id/more_details"
+            android:title="@string/more_details"
+            app:showAsAction="never"
+            android:orderInCategory="2"/>
+
+        <item
+            android:id="@+id/settings"
+            android:title="@string/settings"
+            app:showAsAction="never"
+            android:orderInCategory="3"/>
+
+    </group>
+
+</menu>

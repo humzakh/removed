@@ -6,12 +6,18 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.Spanned;
+import android.text.style.RelativeSizeSpan;
+import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.webkit.URLUtil;
 import android.widget.TextView;
@@ -19,6 +25,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import org.commonmark.node.Node;
 import org.json.JSONArray;
@@ -30,15 +37,19 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import io.noties.markwon.Markwon;
 
 public class HandleLinkActivity extends AppCompatActivity {
 
     private static final String TAG = "HandleLinkActivity";
-    private List<String> parsedData; // [author, body, score, id, permalink]
+    // [author, body, score, id, permalink, created_utc, retrieved_on, subreddit, subreddit_id, link_id, parent_id, author_fullname]
+    private List<String> parsedData;
     private ProgressDialog progressDialog;
 
     @Override
@@ -110,11 +121,9 @@ public class HandleLinkActivity extends AppCompatActivity {
                     .setTitle("[removed]");
         }
         else if (code == 0) {
-            String author = "/u/" + parsedData.get(0);
-            String score = parsedData.get(2) + " " + ((Integer.valueOf(parsedData.get(2)) == 1) ? "point" : "points");
-
             LayoutInflater inflater = getLayoutInflater();
             View dialogView = inflater.inflate(R.layout.alert_view, null);
+            View dialogTitle = inflater.inflate(R.layout.alert_title, null);
 
             builder.setView(dialogView)
                     .setCancelable(false)
@@ -123,15 +132,7 @@ public class HandleLinkActivity extends AppCompatActivity {
                             finish();
                         }
                     })
-                    .setNeutralButton("View on reddit", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(parsedData.get(4)));
-                            startActivity(browserIntent);
-                            finish();
-                        }
-                    })
-                    .setNegativeButton("Copy Text", new DialogInterface.OnClickListener() {
+                    .setNeutralButton("Copy Text", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
                             ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
@@ -141,14 +142,50 @@ public class HandleLinkActivity extends AppCompatActivity {
                             finish();
                         }
                     })
-                    .setTitle("[removed]");
+                    .setCustomTitle(dialogTitle);
+
+            Toolbar toolbar = dialogTitle.findViewById(R.id.toolbar);
+            // Set an OnMenuItemClickListener to handle menu item clicks
+            toolbar.setOnMenuItemClickListener(
+                    new Toolbar.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem item) {
+
+                            switch (item.getItemId()) {
+                                case R.id.view_on_reddit: {
+                                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(parsedData.get(4)));
+                                    startActivity(browserIntent);
+                                    break;
+                                }
+                                case R.id.more_details: {
+                                    displayAlert(-9);
+                                    break;
+                                }
+                                case R.id.settings: {
+
+                                    break;
+                                }
+
+                            }
+
+
+                            return true;
+                        }
+                    });
+
+            toolbar.inflateMenu(R.menu.alert_overflow);
 
             TextView authorTV = dialogView.findViewById(R.id.authorTV);
-            TextView scoreTV = dialogView.findViewById(R.id.scoreTV);
+            TextView timeTV = dialogView.findViewById(R.id.timeTV);
             TextView bodyTV = dialogView.findViewById(R.id.bodyTV);
 
+            String author = "/u/" + parsedData.get(0);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+            String time = sdf.format(new Date(Long.parseLong(parsedData.get(5))*1000)) + " (UTC)";
+
             authorTV.setText(author);
-            scoreTV.setText(score);
+            timeTV.setText(time);
 
             // obtain an instance of Markwon
             final Markwon markwon = Markwon.create(this);
@@ -161,6 +198,37 @@ public class HandleLinkActivity extends AppCompatActivity {
 
             // use it on a TextView
             markwon.setParsedMarkdown(bodyTV, markdown);
+        }
+        else if (code == -9) {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+            String note = "NOTE: Due to Pushshift's nature as an archive tool, information displayed here may not accurately reflect what is currently displayed on reddit.\n" +
+                    "(see https://reddit.com/bcxguf for more info)\n\n\n";
+
+            String message =
+                    "Author: /u/" + parsedData.get(0) + "\n" +
+                    "Score: " + parsedData.get(2) + " " + ((Integer.valueOf(parsedData.get(2)) == 1) ? "point" : "points") + "\n" +
+                    "Subreddit: /r/" + parsedData.get(7) + "\n\n" +
+                    "Submitted (UTC): " + sdf.format(new Date(Long.parseLong(parsedData.get(5))*1000)) + "\n" +
+                    "Archived (UTC): " + sdf.format(new Date(Long.parseLong(parsedData.get(6))*1000)) + "\n\n" +
+                    "Author ID: " + parsedData.get(11) + "\n" +
+                    "Comment ID: t1_" + parsedData.get(3) + "\n" +
+                    "Parent ID: " + parsedData.get(10) + "\n" +
+                    "Subreddit ID: " + parsedData.get(8);
+
+            SpannableString str = new SpannableString(note + message);
+            str.setSpan(new StyleSpan(Typeface.BOLD), 0, note.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            str.setSpan(new RelativeSizeSpan(0.8f), 0, note.length(), 0);
+
+            builder.setMessage(str)
+                    .setCancelable(false)
+                    .setPositiveButton("Close", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+
+                        }
+                    })
+                    .setTitle("More details");
         }
         else {
             builder.setMessage("Invalid link")
@@ -175,7 +243,6 @@ public class HandleLinkActivity extends AppCompatActivity {
 
         AlertDialog alert = builder.create();
         alert.show();
-
     }
 
     private class FetchDataTask extends AsyncTask<String, Void, String> {
@@ -262,11 +329,18 @@ public class HandleLinkActivity extends AppCompatActivity {
                 for (int i = 0; i < dataArray.length(); i++) {
                     JSONObject item = dataArray.getJSONObject(i);
 
-                    parsedData.add(item.getString("author"));
-                    parsedData.add(item.getString("body"));
-                    parsedData.add(item.getString("score"));
-                    parsedData.add(item.getString("id"));
-                    parsedData.add("https://reddit.com" + item.getString("permalink"));
+                    parsedData.add(item.getString("author")); // 0
+                    parsedData.add(item.getString("body")); // 1
+                    parsedData.add(item.getString("score")); // 2
+                    parsedData.add(item.getString("id")); // 3
+                    parsedData.add("https://reddit.com" + item.getString("permalink")); // 4
+                    parsedData.add(item.getString("created_utc")); // 5
+                    parsedData.add(item.getString("retrieved_on")); // 6
+                    parsedData.add(item.getString("subreddit")); // 7
+                    parsedData.add(item.getString("subreddit_id")); // 8
+                    parsedData.add(item.getString("link_id")); // 9
+                    parsedData.add(item.getString("parent_id")); // 10
+                    parsedData.add(item.getString("author_fullname")); // 11
                 }
 
                 Log.i(TAG, parsedData.toString());
