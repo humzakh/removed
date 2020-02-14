@@ -22,7 +22,7 @@ You NEED to read the comments in the reddit thread, but you notice a lot of them
 
 You can copy the comment URLs, replace "reddit.com" with "removeddit.com" or "ceddit.com", and _then_ read the removed comments, but that'd take way too long and your legs are actually starting to hurt pretty bad now.
 
-But wait! You just remembered you have "[removed]" installed on your phone!
+But wait! You just remembered you have [removed] installed on your phone!
 
 Viewing removed comments is as easy as 1, 2, 3!
 
