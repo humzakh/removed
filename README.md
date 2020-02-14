@@ -5,7 +5,7 @@ An Android app to view [removed] or [deleted] comments on reddit.
 
 Special thanks to: 
 * Jason Baumgartner for creating and maintaining pushshift.io, the ultimate reddit archive tool.
-* Jesper Wrang for creating removeddit.com, a web app for viewing removed comments.
+* Jesper Wrang for creating removeddit.com, a web app for viewing removed comments and posts.
 
 ## Scenario:
 So you're sitting on the toilet, taking care of business, and browsing reddit on your phone.
