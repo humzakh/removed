@@ -3,7 +3,7 @@ An Android app to view [removed] or [deleted] comments on reddit.
 
 [Click here to download the latest release.](https://github.com/Humzaman/removed/releases/latest/download/removed.apk)
 
-Credits to: 
+Special thanks to: 
 * Jason Baumgartner for creating and maintaining pushshift.io, the ultimate reddit archive tool.
 * Jesper Wrang for creating removeddit.com, a web app for viewing removed comments.
 
@@ -22,7 +22,7 @@ You NEED to read the comments in the reddit thread, but you notice a lot of them
 
 You can copy the comment URLs, replace "reddit.com" with "removeddit.com" or "ceddit.com", and _then_ read the removed comments, but that'd take way too long and your legs are actually starting to hurt pretty bad now.
 
-But wait! You just remembered you have [removed] installed on your phone!
+But wait! You just remembered you have "[removed]" installed on your phone!
 
 Viewing removed comments is as easy as 1, 2, 3!
 
