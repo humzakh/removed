@@ -15,9 +15,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void buttonClick(View view) {
-        Intent intent = new Intent(this, HandleLinkActivity.class);
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_SEND);
         intent.putExtra(Intent.EXTRA_TEXT,"https://www.reddit.com/r/removed_test/comments/f3mebi/title/fhjprlg/");
+        intent.setType("text/plain");
 
-        startActivity(intent);
+        Intent shareIntent = Intent.createChooser(intent, null);
+        startActivity(shareIntent);
     }
 }

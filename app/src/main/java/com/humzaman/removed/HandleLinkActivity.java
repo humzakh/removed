@@ -170,6 +170,11 @@ public class HandleLinkActivity extends AppCompatActivity {
                                         break;
                                     }
 
+                                    case R.id.about: {
+                                        displayAlert(7);
+                                        break;
+                                    }
+
                                 }
 
                                 return true;
@@ -266,6 +271,20 @@ public class HandleLinkActivity extends AppCompatActivity {
 
                 TextView sourceTV = mdDialogView.findViewById(R.id.md_source_tv);
                 sourceTV.setText(source);
+
+                break;
+            }
+
+            case 7: { // about dialog
+
+                builder.setView(R.layout.alert_about)
+                        .setCancelable(false)
+                        .setPositiveButton("Close", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.dismiss();
+                            }
+                        })
+                        .setTitle("About");
 
                 break;
             }
