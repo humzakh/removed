@@ -1,11 +1,10 @@
 package com.humzaman.removed;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -17,7 +16,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void buttonClick(View view) {
         Intent intent = new Intent(this, HandleLinkActivity.class);
-        intent.putExtra(intent.EXTRA_TEXT,"https://www.reddit.com/r/AskHistorians/comments/f2d91n/in_1986_microsoft_windows_advertising_stipulated/fhc3z72/");
+        intent.putExtra(Intent.EXTRA_TEXT,"https://www.reddit.com/r/removed_test/comments/f3mebi/title/fhjprlg/");
 
         startActivity(intent);
     }

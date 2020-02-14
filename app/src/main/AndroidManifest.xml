@@ -14,7 +14,9 @@
 
         <activity
             android:name=".HandleLinkActivity"
-            android:theme="@style/Theme.Transparent">
+            android:theme="@style/Theme.Transparent"
+            android:excludeFromRecents="true"
+            android:launchMode="singleTop">
             <intent-filter android:label="[removed]">
                 <action android:name="android.intent.action.SEND" />
 
