@@ -19,7 +19,7 @@
     <string name="linkID">Link ID: </string>
     <string name="subredditID">Subreddit ID: </string>
 
-    <string name="aboutMessage">[removed] is developed by /u/Humzaman\n\nView source code and contribute at\nhttps://github.com/Humzaman/removed\n\n\nCredits:\n\nJason Baumgartner (pushshift.io)\nJesper Wrang (removeddit.com)</string>
+    <string name="aboutMessage">Developed by /u/Humzaman\n\nView source code and contribute at\nhttps://github.com/Humzaman/removed\n\n\nSpecial thanks to:\nJason Baumgartner (pushshift.io)\nJesper Wrang (removeddit.com)</string>
 
     <string name="removed_quick">[removed too quickly to be archived]</string>
 </resources>

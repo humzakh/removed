@@ -8,8 +8,10 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
@@ -55,6 +57,11 @@ public class HandleLinkActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //android O fix bug orientation
+        if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        }
+
         activity = this;
 
         handleLink();
@@ -75,7 +82,7 @@ public class HandleLinkActivity extends AppCompatActivity {
                 // URL structure: reddit.com/r/{subreddit}/comments/{submission id}/{submission title}/{comment id}/
                 if (pathSegments.size() == 5) { // submission
                     String id = pathSegments.get(3);
-                    Log.e(TAG, "Submission ID: " + id);
+                    Log.i(TAG, "Submission ID: " + id);
 
                     // TODO: submission stuff
                     // I'll work on this later.
@@ -87,9 +94,26 @@ public class HandleLinkActivity extends AppCompatActivity {
                     String id = pathSegments.get(5);
                     Log.i(TAG, "Comment ID: " + id);
                     String pushshiftUrl = "https://api.pushshift.io/reddit/search/comment/?ids=" + id;
+                    Log.i(TAG, "Pushshift URL: " + pushshiftUrl);
 
                     new FetchDataTask().execute(pushshiftUrl);
                     // displayAlert(0) is called in onPostExecute()
+                }
+                else if (pathSegments.get(0).equals("comments")) {
+                    if (pathSegments.size() == 4) {
+                        String id = pathSegments.get(3);
+                        Log.i(TAG, "Comment ID: " + id);
+                        String pushshiftUrl = "https://api.pushshift.io/reddit/search/comment/?ids=" + id;
+                        Log.i(TAG, "Pushshift URL: " + pushshiftUrl);
+
+                        new FetchDataTask().execute(pushshiftUrl);
+                        // displayAlert(0) is called in onPostExecute()
+                    }
+                    else {
+                        String id = pathSegments.get(1);
+                        Log.i(TAG, "Submission ID: " + id);
+                        displayAlert(-1);
+                    }
                 }
                 else {
                     Log.e(TAG, "Not a valid comment link.");
@@ -284,7 +308,8 @@ public class HandleLinkActivity extends AppCompatActivity {
                                 dialog.dismiss();
                             }
                         })
-                        .setTitle("About");
+                        .setTitle("About")
+                        .setIcon(R.mipmap.ic_launcher);
 
                 break;
             }
@@ -473,18 +498,19 @@ public class HandleLinkActivity extends AppCompatActivity {
                 for (int i = 0; i < dataArray.length(); i++) {
                     JSONObject item = dataArray.getJSONObject(i);
 
-                    parsedData.add(item.getString("author"));                              // 0
-                    parsedData.add(item.getString("body"));                                // 1
-                    parsedData.add(item.getString("score"));                               // 2
-                    parsedData.add(item.getString("id"));                                  // 3
-                    parsedData.add("https://www.reddit.com" + item.getString("permalink"));// 4
-                    parsedData.add(item.getString("created_utc"));                         // 5
-                    parsedData.add(item.getString("retrieved_on"));                        // 6
-                    parsedData.add(item.getString("subreddit"));                           // 7
-                    parsedData.add(item.getString("subreddit_id"));                        // 8
-                    parsedData.add(item.getString("link_id"));                             // 9
-                    parsedData.add(item.getString("parent_id"));                           // 10
-                    parsedData.add(item.getString("author_fullname"));                     // 11
+                    parsedData.add(item.has("author") ? item.getString("author") : "null");                   // 0
+                    parsedData.add(item.has("body") ? item.getString("body") : "null");                       // 1
+                    parsedData.add(item.has("score") ? item.getString("score") : "null");                     // 2
+                    parsedData.add(item.has("id") ? item.getString("id") : "null");                           // 3
+                    parsedData.add(item.has("permalink") ?
+                            "https://www.reddit.com" + item.getString("permalink") : intentString);                  // 4
+                    parsedData.add(item.has("created_utc") ? item.getString("created_utc") : "0000000000");   // 5
+                    parsedData.add(item.has("retrieved_on") ? item.getString("retrieved_on") : "0000000000"); // 6
+                    parsedData.add(item.has("subreddit") ? item.getString("subreddit") : "null");             // 7
+                    parsedData.add(item.has("subreddit_id") ? item.getString("subreddit_id") : "null");       // 8
+                    parsedData.add(item.has("link_id") ? item.getString("link_id") : "null");                 // 9
+                    parsedData.add(item.has("parent_id") ? item.getString("parent_id") : "null");             // 10
+                    parsedData.add(item.has("author_fullname") ? item.getString("author_fullname") : "null"); // 11
                 }
                 Log.i(TAG, "Parsed data: " + parsedData.toString());
             } catch(Exception e) {

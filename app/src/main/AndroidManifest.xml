@@ -18,7 +18,6 @@
             android:name=".HandleLinkActivity"
             android:theme="@style/Theme.Transparent"
             android:excludeFromRecents="true"
-            android:screenOrientation="portrait"
             android:launchMode="singleTop">
             <intent-filter android:label="[removed]">
                 <action android:name="android.intent.action.SEND" />
@@ -34,7 +33,6 @@
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
 
             </intent-filter>
         </activity>
