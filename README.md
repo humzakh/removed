@@ -26,7 +26,7 @@ __2. Tap on [removed]__
 
 <img src="https://user-images.githubusercontent.com/13255511/74520913-1d546d80-4ede-11ea-8fae-a7c6aed78220.jpg" width="350px">
 
-__3. Enjoy your unremoved content!__
+__3. Enjoy your unremoved comment!__
 
 <img src="https://user-images.githubusercontent.com/13255511/74520915-1f1e3100-4ede-11ea-8cac-d791f773324f.jpg" width="350px">
                                                                                                                             
