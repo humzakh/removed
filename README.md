@@ -1,7 +1,7 @@
 # [removed] <img src="https://user-images.githubusercontent.com/13255511/74567142-b74a0380-4f3a-11ea-990b-c7d30f3fa078.png" width="100px" align="left">
 An Android app to quickly view [removed] or [deleted] comments on reddit.
 
-~~__Click here to download the latest release.__~~ Temporarily disabled while I publish the app to the Play Store.
+[__Click here to download on Google Play Store.__](https://play.google.com/store/apps/details?id=com.humzaman.removed)
 
 Special thanks to: 
 * Jason Baumgartner for creating and maintaining pushshift.io, the ultimate reddit archive tool.
