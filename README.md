@@ -1,30 +1,22 @@
 # [removed] <img src="https://user-images.githubusercontent.com/13255511/74567142-b74a0380-4f3a-11ea-990b-c7d30f3fa078.png" width="100px" align="left">
 An Android app to quickly view [removed] or [deleted] comments on reddit.
 
-[__Click here to download the latest release.__](https://github.com/Humzaman/removed/releases/latest/download/removed.apk)
+[__Click here to download on Google Play Store.__](https://play.google.com/store/apps/details?id=com.humzaman.removed)
 
 Special thanks to: 
 * Jason Baumgartner for creating and maintaining pushshift.io, the ultimate reddit archive tool.
 * Jesper Wrang for creating removeddit.com, a web app for viewing removed comments and posts.
 
-## Scenario:
-So you're sitting on the toilet, taking care of business, and browsing reddit on your phone.
+----
+When I'm browsing through reddit, I tend to come across [removed] and [deleted] comments pretty frequently. Sometimes those comments are removed for saying something controversial, earning a ton of downvotes and disapproving responses. Other times, a comment is removed by the /r/AskHistorians mods for not meeting subreddit guidelines.
 
-You come across a thread linking to an article with a __controversial__ headline. 
+Regardless of the reason, my curiosity demands seeing what that comment originally said. I started out by copying the comment URL, replacing "reddit.com" with "removeddit.com" or "ceddit.com," then viewing the unremoved comment in a browser. But that quickly became incredibly tedious to do every single time.
 
-The article is breaking news and full of some _spicy_ text. 
+So, I figured I'd make an app that directly retrieves archived data from pushshift.io, the source removeddit and ceddit get their data from.
 
-Your legs are going numb since you've been on the toilet for half an hour, but that doesn't matter right now. 
+Introducing "[removed]," an app that quickly brings up a dialog displaying a removed comment's data.
 
-You NEED to read the comments in the reddit thread, but you notice a lot of them have been removed or deleted!
-
-<img src="https://user-images.githubusercontent.com/13255511/74518318-39a1db80-4ed9-11ea-8e07-09a620b7cb2a.jpg" width="350px">
-
-You can copy the comment URLs, replace "reddit.com" with "removeddit.com" or "ceddit.com", and _then_ read the removed comments, but that'd take way too long and your legs are actually starting to hurt pretty bad now.
-
-But wait! You just remembered you have [removed] installed on your phone!
-
-Viewing removed comments is as easy as 1, 2, 3!
+Unremoving a comment now only takes a few simple steps:
 
 __1. Share the comment__
 
@@ -34,11 +26,7 @@ __2. Tap on [removed]__
 
 <img src="https://user-images.githubusercontent.com/13255511/74520913-1d546d80-4ede-11ea-8fae-a7c6aed78220.jpg" width="350px">
 
-__3. Enjoy your unremoved content!__
+__3. Enjoy your unremoved comment!__
 
 <img src="https://user-images.githubusercontent.com/13255511/74520915-1f1e3100-4ede-11ea-8cac-d791f773324f.jpg" width="350px">
-
-### Easy peasy!
-
-~~Now hurry up and wipe your butt.~~
                                                                                                                             
