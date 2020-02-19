@@ -1,4 +1,4 @@
-# [removed] <img src="https://user-images.githubusercontent.com/13255511/74567142-b74a0380-4f3a-11ea-990b-c7d30f3fa078.png" width="100px" align="left">
+# [removed] <img src="https://user-images.githubusercontent.com/13255511/74567142-b74a0380-4f3a-11ea-990b-c7d30f3fa078.png" width="90px" align="left">
 An Android app to quickly view [removed] and [deleted] reddit comments.
 
 <a href='https://play.google.com/store/apps/details?id=com.humzaman.removed'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png' width="300px"/></a>
