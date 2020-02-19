@@ -62,14 +62,15 @@ public class HandleLinkActivity extends AppCompatActivity {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         }
 
-        activity = this;
-
-        handleLink();
+        Intent intent = getIntent();
+        if (intent.hasExtra(Intent.EXTRA_TEXT)) {
+            activity = this;
+            intentString = intent.getStringExtra(Intent.EXTRA_TEXT);
+            handleLink();
+        }
     }
 
     private void handleLink() {
-        Intent intent = getIntent();
-        intentString = intent.getStringExtra(Intent.EXTRA_TEXT);
         Log.i(TAG, "Intent string: " + intentString);
 
         if (URLUtil.isValidUrl(intentString)) {
@@ -132,17 +133,30 @@ public class HandleLinkActivity extends AppCompatActivity {
     }
 
     private void displayAlert(int code) {
+        LayoutInflater inflater = getLayoutInflater();
+        @SuppressLint("InflateParams") View dialogTitle = inflater.inflate(R.layout.alert_title, null);
+        Toolbar toolbar = dialogTitle.findViewById(R.id.toolbar);
+
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder.setCustomTitle(dialogTitle)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.dismiss();
+                        finish();
+                    }
+                })
+                .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        dialog.dismiss();
+                        finish();
+                    }
+                });
 
         switch (code) {
             case 0: { // valid comment link
-                LayoutInflater inflater = getLayoutInflater();
-                @SuppressLint("InflateParams") View dialogTitle = inflater.inflate(R.layout.alert_title, null);
                 @SuppressLint("InflateParams") View dialogView = inflater.inflate(R.layout.alert_view, null);
-
-                builder.setCustomTitle(dialogTitle)
-                        .setView(dialogView)
-                        .setCancelable(false)
+                builder.setView(dialogView)
                         .setPositiveButton("Close", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 dialog.dismiss();
@@ -168,7 +182,6 @@ public class HandleLinkActivity extends AppCompatActivity {
                 }
                 final String finalRemoveddit = removeddit.replaceFirst("reddit", "removeddit");
 
-                Toolbar toolbar = dialogTitle.findViewById(R.id.toolbar);
                 toolbar.setOnMenuItemClickListener(
                         new Toolbar.OnMenuItemClickListener() {
                             @Override
@@ -244,26 +257,32 @@ public class HandleLinkActivity extends AppCompatActivity {
             }
 
             case 1: { // more details dialog
-                LayoutInflater inflater = getLayoutInflater();
+                toolbar.setTitle("More details");
+
                 @SuppressLint("InflateParams") View mdDialogView = inflater.inflate(R.layout.alert_moredetails, null);
 
                 builder.setView(mdDialogView)
-                        .setCancelable(false)
                         .setPositiveButton("Close", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 dialog.dismiss();
                             }
                         })
-                        .setTitle("More details");
+                        .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                            @Override
+                            public void onCancel(DialogInterface dialog) {
+                                dialog.dismiss();
+                                //finish();
+                            }
+                        });
 
                 @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 
                 String author = "/u/" + parsedData.get(0);
-                String score =  parsedData.get(2) + " " + ((Integer.valueOf(parsedData.get(2)) == 1) ? "point" : "points");
+                String score =  (parsedData.get(2).equals("null") ? "null" : parsedData.get(2) + " " + ((Integer.valueOf(parsedData.get(2)) == 1) ? "point" : "points"));
                 String subreddit = "/r/" + parsedData.get(7);
-                String submitted = sdf.format(new Date(Long.parseLong(parsedData.get(5)) * 1000));
-                String archived = sdf.format(new Date(Long.parseLong(parsedData.get(6)) * 1000));
+                String submitted = (parsedData.get(5).equals("null") ? "null" : sdf.format(new Date(Long.parseLong(parsedData.get(5)) * 1000)));
+                String archived = (parsedData.get(5).equals("null") ? "null" : sdf.format(new Date(Long.parseLong(parsedData.get(6)) * 1000)));
                 String commentID = "t1_" + parsedData.get(3);
                 String source = "Data retrieved from https://api.pushshift.io/reddit/search/comment/?ids=" + parsedData.get(3);
 
@@ -300,16 +319,21 @@ public class HandleLinkActivity extends AppCompatActivity {
             }
 
             case 7: { // about dialog
+                toolbar.setTitle("About [removed]");
 
                 builder.setView(R.layout.alert_about)
-                        .setCancelable(false)
                         .setPositiveButton("Close", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 dialog.dismiss();
                             }
                         })
-                        .setTitle("About")
-                        .setIcon(R.mipmap.ic_launcher);
+                        .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                            @Override
+                            public void onCancel(DialogInterface dialog) {
+                                dialog.dismiss();
+                                //finish();
+                            }
+                        });
 
                 break;
             }
@@ -322,13 +346,6 @@ public class HandleLinkActivity extends AppCompatActivity {
                 final String finalRemoveddit = removeddit.replaceFirst("reddit", "removeddit");
 
                 builder.setMessage("Submission links are not currently supported.\n\nTap \"Removeddit\" to view the submission on removeddit.com, or try again with a direct link to a comment.")
-                        .setCancelable(false)
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.dismiss();
-                                finish();
-                            }
-                        })
                         .setNeutralButton("Removeddit", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int i) {
@@ -341,57 +358,29 @@ public class HandleLinkActivity extends AppCompatActivity {
                         });
                 break;
             }
+            case -4: // not a link
+                builder.setMessage("Error: Please share a direct link, not the comment text.");
+                break;
 
             case -5: // failed to retrieve data
-                builder.setMessage("Error: Failed to retrieve data from pushshift.io")
-                        .setCancelable(false)
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.dismiss();
-                                finish();
-                            }
-                        })
-                        .setTitle("[removed]");
+                builder.setMessage("Error: Failed to retrieve data from pushshift.io");
                 break;
 
             case -6: // No internet
-                builder.setMessage("Error: Check internet connection")
-                        .setCancelable(false)
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.dismiss();
-                                finish();
-                            }
-                        })
-                        .setTitle("[removed]");
+                builder.setMessage("Error: Check internet connection");
                 break;
 
             case -7: // No data found on pushshift
-                builder.setMessage("Error: No data found for this comment on pushshift.io")
-                        .setCancelable(false)
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.dismiss();
-                                finish();
-                            }
-                        })
-                        .setTitle("[removed]");
+                builder.setMessage("Error: No data found for this comment on pushshift.io");
                 break;
 
             default: // invalid link
-                builder.setMessage("Error: Invalid link")
-                        .setCancelable(false)
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.dismiss();
-                                finish();
-                            }
-                        })
-                        .setTitle("[removed]");
+                builder.setMessage("Error: Invalid link");
                 break;
         }
 
         AlertDialog alert = builder.create();
+        alert.setCanceledOnTouchOutside(false);
         alert.show();
     }
 
@@ -502,10 +491,10 @@ public class HandleLinkActivity extends AppCompatActivity {
                     parsedData.add(item.has("body") ? item.getString("body") : "null");                       // 1
                     parsedData.add(item.has("score") ? item.getString("score") : "null");                     // 2
                     parsedData.add(item.has("id") ? item.getString("id") : "null");                           // 3
-                    parsedData.add(item.has("permalink") ?
-                            "https://www.reddit.com" + item.getString("permalink") : intentString);                  // 4
-                    parsedData.add(item.has("created_utc") ? item.getString("created_utc") : "0000000000");   // 5
-                    parsedData.add(item.has("retrieved_on") ? item.getString("retrieved_on") : "0000000000"); // 6
+                    parsedData.add(item.has("permalink") ?                                                           // 4
+                            "https://www.reddit.com" + item.getString("permalink") : intentString);
+                    parsedData.add(item.has("created_utc") ? item.getString("created_utc") : "null");         // 5
+                    parsedData.add(item.has("retrieved_on") ? item.getString("retrieved_on") : "null");       // 6
                     parsedData.add(item.has("subreddit") ? item.getString("subreddit") : "null");             // 7
                     parsedData.add(item.has("subreddit_id") ? item.getString("subreddit_id") : "null");       // 8
                     parsedData.add(item.has("link_id") ? item.getString("link_id") : "null");                 // 9

@@ -22,4 +22,9 @@
     <string name="aboutMessage">Developed by /u/Humzaman\n\nView source code and contribute at\nhttps://github.com/Humzaman/removed\n\n\nSpecial thanks to:\nJason Baumgartner (pushshift.io)\nJesper Wrang (removeddit.com)</string>
 
     <string name="removed_quick">[removed too quickly to be archived]</string>
+    <string name="main_title">How to use "[removed]"</string>
+    <string name="main_intro">Reading a [removed] or [deleted] reddit comment can be done in just a few easy steps:</string>
+    <string name="main_instructions">1. Share the comment.\n\n2. Choose "[removed]" from the list.\n\n3. Enjoy the unremoved comment!</string>
+    <string name="main_try">Try it out in your favorite reddit app, or use the button below for a demonstration.</string>
+    <string name="button">Share comment</string>
 </resources>
