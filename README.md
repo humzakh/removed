@@ -10,7 +10,7 @@ Special thanks to:
 ----
 When I'm browsing through reddit, I tend to come across [removed] and [deleted] comments pretty frequently. Sometimes those comments are removed for saying something controversial, earning a ton of downvotes and disapproving responses. Other times, a comment is removed by the /r/AskHistorians mods for not meeting subreddit guidelines.
 
-Regardless of the reason, my curiosity demands seeing what that comment originally said. I started out by copying the comment URL, replacing "reddit.com" with "removeddit.com" or "ceddit.com," then viewing the unremoved comment in a browser. But that quickly became incredibly tedious to do every single time.
+Regardless of the reason, my curiosity demands seeing what that comment originally said. I started out by copying the comment URL, replacing "reddit.com" with "removeddit.com" or "ceddit.com," _then_ viewing the unremoved comment in a browser. But that quickly became incredibly tedious to do every single time.
 
 So, I figured I'd make an app that directly retrieves archived data from pushshift.io, the source removeddit and ceddit get their data from.
 
