@@ -1,7 +1,7 @@
-# [removed] <img src="https://user-images.githubusercontent.com/13255511/74567142-b74a0380-4f3a-11ea-990b-c7d30f3fa078.png" width="100px" align="left">
-An Android app to quickly view [removed] or [deleted] comments on reddit.
+# [removed] <img src="https://user-images.githubusercontent.com/13255511/74567142-b74a0380-4f3a-11ea-990b-c7d30f3fa078.png" width="90px" align="left">
+An Android app to quickly view [removed] and [deleted] reddit comments.
 
-[__Click here to download on Google Play Store.__](https://play.google.com/store/apps/details?id=com.humzaman.removed)
+<a href='https://play.google.com/store/apps/details?id=com.humzaman.removed'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png' width="300px"/></a>
 
 Special thanks to: 
 * Jason Baumgartner for creating and maintaining pushshift.io, the ultimate reddit archive tool.
@@ -10,11 +10,11 @@ Special thanks to:
 ----
 When I'm browsing through reddit, I tend to come across [removed] and [deleted] comments pretty frequently. Sometimes those comments are removed for saying something controversial, earning a ton of downvotes and disapproving responses. Other times, a comment is removed by the /r/AskHistorians mods for not meeting subreddit guidelines.
 
-Regardless of the reason, my curiosity demands seeing what that comment originally said. I started out by copying the comment URL, replacing "reddit.com" with "removeddit.com" or "ceddit.com," then viewing the unremoved comment in a browser. But that quickly became incredibly tedious to do every single time.
+Regardless of the reason, my curiosity demands seeing what that comment originally said. I started out by copying the comment URL, replacing "reddit.com" with "removeddit.com" or "ceddit.com," _then_ viewing the unremoved comment in a browser. But that quickly became incredibly tedious to do every single time.
 
 So, I figured I'd make an app that directly retrieves archived data from pushshift.io, the source removeddit and ceddit get their data from.
 
-Introducing "[removed]," an app that quickly brings up a dialog displaying a removed comment's data.
+Introducing "[removed]," an app that quickly displays a dialog with a removed comment's data.
 
 Unremoving a comment now only takes a few simple steps:
 
