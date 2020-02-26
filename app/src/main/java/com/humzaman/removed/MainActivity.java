@@ -13,16 +13,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 public class MainActivity extends AppCompatActivity {
-    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        toolbar = findViewById(R.id.toolbar2);
+        Toolbar toolbar = findViewById(R.id.mainToolbar);
         setSupportActionBar(toolbar);
-
     }
 
     @Override
@@ -37,12 +35,8 @@ public class MainActivity extends AppCompatActivity {
 
         if (id == R.id.action_about) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            dialog.dismiss();
-                            //finish();
-                        }
-                    })
+            builder.setTitle("About [removed]")
+                    .setIcon(R.mipmap.ic_launcher)
                     .setOnCancelListener(new DialogInterface.OnCancelListener() {
                         @Override
                         public void onCancel(DialogInterface dialog) {
@@ -78,6 +72,10 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_SEND);
         intent.putExtra(Intent.EXTRA_TEXT,"https://www.reddit.com/r/removed_test/comments/f3mebi/title/fhk7w3k/");
+
+        // test link for [removed too quickly to be archived]
+        //intent.putExtra(Intent.EXTRA_TEXT,"https://www.reddit.com/r/removed_test/comments/f3mebi/title/fis1ckk/");
+
         intent.setType("text/plain");
 
         Intent shareIntent = Intent.createChooser(intent, null);

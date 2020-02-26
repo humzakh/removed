@@ -8,10 +8,8 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
@@ -26,6 +24,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.text.HtmlCompat;
 
 import org.commonmark.node.Node;
 import org.json.JSONArray;
@@ -50,17 +49,14 @@ public class HandleLinkActivity extends AppCompatActivity {
     private static final String TAG = "HandleLinkActivity";
     private Activity activity;
     private String intentString;
-    // [author, body, score, id, permalink, created_utc, retrieved_on, subreddit, subreddit_id, link_id, parent_id, author_fullname]
+    private String pushshiftUrl;
+    //parsedData: [author, body, score, id, permalink, created_utc, retrieved_on, subreddit, subreddit_id, link_id, parent_id, author_fullname]
     private List<String> parsedData;
     private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //android O fix bug orientation
-        if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        }
 
         Intent intent = getIntent();
         if (intent.hasExtra(Intent.EXTRA_TEXT)) {
@@ -94,7 +90,7 @@ public class HandleLinkActivity extends AppCompatActivity {
                 else if (pathSegments.size() == 6) { // comment
                     String id = pathSegments.get(5);
                     Log.i(TAG, "Comment ID: " + id);
-                    String pushshiftUrl = "https://api.pushshift.io/reddit/search/comment/?ids=" + id;
+                    pushshiftUrl = "https://api.pushshift.io/reddit/search/comment/?ids=" + id;
                     Log.i(TAG, "Pushshift URL: " + pushshiftUrl);
 
                     new FetchDataTask().execute(pushshiftUrl);
@@ -104,7 +100,7 @@ public class HandleLinkActivity extends AppCompatActivity {
                     if (pathSegments.size() == 4) {
                         String id = pathSegments.get(3);
                         Log.i(TAG, "Comment ID: " + id);
-                        String pushshiftUrl = "https://api.pushshift.io/reddit/search/comment/?ids=" + id;
+                        pushshiftUrl = "https://api.pushshift.io/reddit/search/comment/?ids=" + id;
                         Log.i(TAG, "Pushshift URL: " + pushshiftUrl);
 
                         new FetchDataTask().execute(pushshiftUrl);
@@ -222,25 +218,25 @@ public class HandleLinkActivity extends AppCompatActivity {
                 TextView authorTV = dialogView.findViewById(R.id.authorTV);
                 TextView timeTV = dialogView.findViewById(R.id.timeTV);
                 TextView bodyTV = dialogView.findViewById(R.id.bodyTV);
-                bodyTV.setMovementMethod(LinkMovementMethod.getInstance()); // make links clickable
 
-                String author = "/u/" + parsedData.get(0);
+                if (!parsedData.get(0).equals("[deleted]")) { // open user profile
+                    authorTV.setMovementMethod(LinkMovementMethod.getInstance());
+                    String html = "<a href='https://www.reddit.com/u/" + parsedData.get(0) + "'>/u/" + parsedData.get(0) + "</a>";
+                    authorTV.setText(HtmlCompat.fromHtml(html, HtmlCompat.FROM_HTML_MODE_LEGACY));
+                }
+                else
+                    authorTV.setText(R.string.deleted);
+
                 @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
                 String time = sdf.format(new Date(Long.parseLong(parsedData.get(5)) * 1000));
 
-                authorTV.setText(author);
                 timeTV.setText(time);
 
-                // if the comment was removed to quickly to be archived,
-                // disable the More Details option.
-                // Pushshift will return the author as [deleted], so that's our check.
-                if (parsedData.get(0).equals("[deleted]")) {
-                    toolbar.getMenu().getItem(2).setEnabled(false);
+                if (parsedData.get(0).equals("[deleted]")) // removed too quickly to be archived
                     bodyTV.setText(R.string.removed_quick);
-                }
                 else {
-                    toolbar.getMenu().getItem(2).setEnabled(true);
+                    bodyTV.setMovementMethod(LinkMovementMethod.getInstance()); // make links clickable
 
                     // reddit comments use markdown format.
                     // obtain an instance of Markwon
@@ -279,12 +275,12 @@ public class HandleLinkActivity extends AppCompatActivity {
                 sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 
                 String author = "/u/" + parsedData.get(0);
-                String score =  (parsedData.get(2).equals("null") ? "null" : parsedData.get(2) + " " + ((Integer.valueOf(parsedData.get(2)) == 1) ? "point" : "points"));
+                String score =  (parsedData.get(2).equals("null") ? "null" : parsedData.get(2) + " " + ((Integer.parseInt(parsedData.get(2)) == 1) ? "point" : "points"));
                 String subreddit = "/r/" + parsedData.get(7);
                 String submitted = (parsedData.get(5).equals("null") ? "null" : sdf.format(new Date(Long.parseLong(parsedData.get(5)) * 1000)));
                 String archived = (parsedData.get(5).equals("null") ? "null" : sdf.format(new Date(Long.parseLong(parsedData.get(6)) * 1000)));
                 String commentID = "t1_" + parsedData.get(3);
-                String source = "Data retrieved from https://api.pushshift.io/reddit/search/comment/?ids=" + parsedData.get(3);
+                String source = "Data source: " + pushshiftUrl;
 
                 TextView noteTV = mdDialogView.findViewById(R.id.md_note_tv);
                 noteTV.setMovementMethod(LinkMovementMethod.getInstance());
@@ -319,9 +315,10 @@ public class HandleLinkActivity extends AppCompatActivity {
             }
 
             case 7: { // about dialog
-                toolbar.setTitle("About [removed]");
-
-                builder.setView(R.layout.alert_about)
+                builder.setCustomTitle(null)
+                        .setTitle("About [removed]")
+                        .setIcon(R.mipmap.ic_launcher)
+                        .setView(R.layout.alert_about)
                         .setPositiveButton("Close", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 dialog.dismiss();
@@ -386,6 +383,7 @@ public class HandleLinkActivity extends AppCompatActivity {
 
     // idk the right thing to do about this memory leak warning,
     // so I'm just gonna ignore it and hope nothing bad happens lol
+    @SuppressLint("StaticFieldLeak")
     private class FetchDataTask extends AsyncTask<String, Void, String> {
         @Override
         protected void onPreExecute() {
@@ -452,7 +450,8 @@ public class HandleLinkActivity extends AppCompatActivity {
                 //parse the JSON data and then display
                 parseJSON(dataFetched);
 
-                progressDialog.dismiss();
+                if (progressDialog.isShowing())
+                    progressDialog.dismiss();
 
                 if (parsedData.size() != 0)
                     displayAlert(0);
@@ -491,7 +490,7 @@ public class HandleLinkActivity extends AppCompatActivity {
                     parsedData.add(item.has("body") ? item.getString("body") : "null");                       // 1
                     parsedData.add(item.has("score") ? item.getString("score") : "null");                     // 2
                     parsedData.add(item.has("id") ? item.getString("id") : "null");                           // 3
-                    parsedData.add(item.has("permalink") ?                                                           // 4
+                    parsedData.add(item.has("permalink") ?                                                          // 4
                             "https://www.reddit.com" + item.getString("permalink") : intentString);
                     parsedData.add(item.has("created_utc") ? item.getString("created_utc") : "null");         // 5
                     parsedData.add(item.has("retrieved_on") ? item.getString("retrieved_on") : "null");       // 6
