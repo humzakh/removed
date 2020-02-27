@@ -11,7 +11,27 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/theme"
+            android:layout_weight="1"
+            android:textColor="?android:attr/textColorPrimary" />
+
+        <Spinner
+            android:id="@+id/spinner"
+            android:entries="@array/app_theme"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
         android:orientation="vertical">
 
         <TextView
@@ -20,7 +40,7 @@
             android:layout_margin="16dp"
             android:textAlignment="center"
             android:textSize="24sp"
-            android:textColor="#000000"
+            android:textColor="?android:attr/textColorPrimary"
             android:textStyle="bold"
             android:text="@string/main_title"/>
 
@@ -29,7 +49,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
             android:textSize="16sp"
-            android:textColor="#000000"
+            android:textColor="?android:attr/textColorPrimary"
             android:text="@string/main_intro"/>
 
         <TextView
@@ -37,7 +57,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="32dp"
             android:textSize="16sp"
-            android:textColor="#000000"
+            android:textColor="?android:attr/textColorPrimary"
             android:text="@string/main_instructions"/>
 
         <TextView
@@ -46,7 +66,7 @@
             android:textAlignment="center"
             android:layout_margin="24dp"
             android:textSize="16sp"
-            android:textColor="#000000"
+            android:textColor="?android:attr/textColorPrimary"
             android:text="@string/main_try"/>
 
         <Button
@@ -55,7 +75,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:text="@string/button"
-            android:onClick="buttonClick"/>
+            android:onClick="buttonClick"
+            android:textColor="#fff"/>
 
     </LinearLayout>
 

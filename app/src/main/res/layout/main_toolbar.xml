@@ -5,6 +5,6 @@
     app:title="@string/app_name"
     android:background="?attr/colorPrimary"
     android:minHeight="?attr/actionBarSize"
-    android:theme="@style/AppToolbar"
+    android:theme="@style/ThemeOverlay.MaterialComponents.Dark"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"/>

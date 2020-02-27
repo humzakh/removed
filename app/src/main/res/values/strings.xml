@@ -26,6 +26,15 @@
     <string name="main_title">How to use "[removed]"</string>
     <string name="main_intro">Reading a [removed] or [deleted] reddit comment can be done in just a few easy steps:</string>
     <string name="main_instructions">1. Share the comment.\n\n2. Choose "[removed]" from the list.\n\n3. Enjoy the unremoved comment!</string>
-    <string name="main_try">Try it out in your favorite reddit app, or use the button below for a demonstration.</string>
+    <string name="main_try">Try it out in your favorite reddit app,\nor use the button below for a demonstration.</string>
     <string name="button">Share comment</string>
+
+    <string name="show_app">Show app in app drawer</string>
+    <string name="theme">Theme</string>
+
+    <string-array name="app_theme">
+        <item>Light</item>
+        <item>Dark</item>
+        <item>Follow System</item>
+    </string-array>
 </resources>
