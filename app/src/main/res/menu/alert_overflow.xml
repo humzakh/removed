@@ -2,21 +2,22 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <group android:id="@+id/grp1">
+    <group android:id="@+id/group1">
         <item
-        android:id="@+id/about"
-        android:title="@string/about"
-        app:showAsAction="never"
-        android:orderInCategory="1"/>
+            android:id="@+id/about"
+            android:title="@string/about"
+            app:showAsAction="never"
+            android:orderInCategory="1"/>
 
         <item
             android:id="@+id/settings"
             android:title="@string/settings"
             app:showAsAction="never"
+            android:visible="false"
             android:orderInCategory="2"/>
     </group>
 
-    <group android:id="@+id/grp2">
+    <group android:id="@+id/group2">
         <item
             android:id="@+id/view_on_reddit"
             android:title="@string/view_on_reddit"
@@ -34,6 +35,7 @@
             android:title="@string/more_details"
             app:showAsAction="never"
             android:orderInCategory="5"/>
+
     </group>
 
 </menu>

@@ -7,8 +7,8 @@ android {
         applicationId "com.humzaman.removed"
         minSdkVersion 22
         targetSdkVersion 29
-        versionCode 4
-        versionName "1.3"
+        versionCode 5
+        versionName "1.3.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -29,7 +29,4 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
     implementation "io.noties.markwon:core:4.2.1"
-
-    implementation 'com.google.android.material:material:1.1.0'
-
 }

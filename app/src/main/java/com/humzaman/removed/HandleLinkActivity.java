@@ -8,16 +8,13 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.URLUtil;
@@ -26,7 +23,6 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.text.HtmlCompat;
 import androidx.core.view.MenuCompat;
@@ -52,8 +48,6 @@ import io.noties.markwon.Markwon;
 public class HandleLinkActivity extends AppCompatActivity {
 
     private static final String TAG = "HandleLinkActivity";
-    SharedPreferences prefs;
-    private static final String theme = "com.humzaman.removed.theme";
     private Activity activity;
     private String intentString;
     private String pushshiftUrl;
@@ -64,9 +58,6 @@ public class HandleLinkActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        prefs = this.getSharedPreferences("com.humzaman.removed", Context.MODE_PRIVATE);
-        AppCompatDelegate.setDefaultNightMode(prefs.getInt(theme, AppCompatDelegate.MODE_NIGHT_NO));
 
         Intent intent = getIntent();
         if (intent.hasExtra(Intent.EXTRA_TEXT)) {
@@ -162,7 +153,6 @@ public class HandleLinkActivity extends AppCompatActivity {
         switch (code) {
             case 0: { // valid comment link
                 @SuppressLint("InflateParams") View dialogView = inflater.inflate(R.layout.alert_view, null);
-
                 builder.setView(dialogView)
                         .setPositiveButton("Close", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
@@ -193,6 +183,7 @@ public class HandleLinkActivity extends AppCompatActivity {
                         new Toolbar.OnMenuItemClickListener() {
                             @Override
                             public boolean onMenuItemClick(MenuItem item) {
+
                                 switch (item.getItemId()) {
                                     case R.id.view_on_reddit: {
                                         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(parsedData.get(4)));
@@ -207,18 +198,19 @@ public class HandleLinkActivity extends AppCompatActivity {
                                     case R.id.more_details:
                                         displayAlert(1);
                                         break;
+
                                     case R.id.settings: {
-                                        Intent settingsIntent = new Intent(activity, MainActivity.class);
-                                        settingsIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                        finish();
-                                        startActivity(settingsIntent);
+
                                         break;
                                     }
+
                                     case R.id.about: {
                                         displayAlert(7);
                                         break;
                                     }
+
                                 }
+
                                 return true;
                             }
                         });
@@ -352,32 +344,6 @@ public class HandleLinkActivity extends AppCompatActivity {
                 }
                 final String finalRemoveddit = removeddit.replaceFirst("reddit", "removeddit");
 
-                toolbar.setOnMenuItemClickListener(
-                        new Toolbar.OnMenuItemClickListener() {
-                            @Override
-                            public boolean onMenuItemClick(MenuItem item) {
-                                switch (item.getItemId()) {
-                                    case R.id.settings: {
-                                        Intent settingsIntent = new Intent(activity, MainActivity.class);
-                                        settingsIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                        finish();
-                                        startActivity(settingsIntent);
-                                        break;
-                                    }
-                                    case R.id.about: {
-                                        displayAlert(7);
-                                        break;
-                                    }
-                                }
-                                return true;
-                            }
-                        });
-                toolbar.inflateMenu(R.menu.alert_overflow);
-                Menu menu = toolbar.getMenu();
-                menu.getItem(2).setVisible(false);
-                menu.getItem(3).setVisible(false);
-                menu.getItem(4).setVisible(false);
-
                 builder.setMessage("Submission links are not currently supported.\n\nTap \"Removeddit\" to view the submission on removeddit.com, or try again with a direct link to a comment.")
                         .setNeutralButton("Removeddit", new DialogInterface.OnClickListener() {
                             @Override
@@ -424,11 +390,7 @@ public class HandleLinkActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.M) // if on Lollipop, make the progressDialog not fugly
-                progressDialog = new ProgressDialog(activity, R.style.ThemeOverlay_AppCompat_Dark);
-            else
-                progressDialog = new ProgressDialog(activity);
-
+            progressDialog = new ProgressDialog(activity);
             progressDialog.setCancelable(false);
             progressDialog.setMessage("Unremoving...");
             progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
@@ -479,18 +441,20 @@ public class HandleLinkActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String dataFetched) {
             if (dataFetched == null) {
-                progressDialog.dismiss();
+                if (progressDialog != null && progressDialog.isShowing())
+                    progressDialog.dismiss();
                 displayAlert(-6);
             }
             else if (dataFetched.equals("FAILED")) {
-                progressDialog.dismiss();
+                if (progressDialog != null && progressDialog.isShowing())
+                    progressDialog.dismiss();
                 displayAlert(-5);
             }
             else {
                 //parse the JSON data and then display
                 parseJSON(dataFetched);
 
-                if (progressDialog.isShowing())
+                if (progressDialog != null && progressDialog.isShowing())
                     progressDialog.dismiss();
 
                 if (parsedData.size() != 0)
