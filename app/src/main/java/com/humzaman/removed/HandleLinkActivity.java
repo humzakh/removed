@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Spanned;
+import android.text.format.DateUtils;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -51,7 +52,8 @@ public class HandleLinkActivity extends AppCompatActivity {
     private Activity activity;
     private String intentString;
     private String pushshiftUrl;
-    //parsedData: [author, body, score, id, permalink, created_utc, retrieved_on, subreddit, subreddit_id, link_id, parent_id, author_fullname]
+    private FetchDataTask fdt; // lol this variable name is excellent. #FDT
+    // parsedData: [author, body, score, id, permalink, created_utc, retrieved_on, subreddit, subreddit_id, link_id, parent_id, author_fullname]
     private List<String> parsedData;
     private ProgressDialog progressDialog;
 
@@ -64,6 +66,21 @@ public class HandleLinkActivity extends AppCompatActivity {
             activity = this;
             intentString = intent.getStringExtra(Intent.EXTRA_TEXT);
             handleLink();
+        }
+    }
+
+    @Override
+    protected void onDestroy() { // handle activity destruction issues (screen rotation)
+        super.onDestroy();
+
+        if (progressDialog != null) {
+            if (progressDialog.isShowing())
+                progressDialog.dismiss();
+            progressDialog = null;
+        }
+
+        if (fdt != null && !fdt.isCancelled()) {
+            fdt.cancel(true);
         }
     }
 
@@ -104,7 +121,8 @@ public class HandleLinkActivity extends AppCompatActivity {
                         pushshiftUrl = "https://api.pushshift.io/reddit/search/comment/?ids=" + id;
                         Log.i(TAG, "Pushshift URL: " + pushshiftUrl);
 
-                        new FetchDataTask().execute(pushshiftUrl);
+                        fdt = new FetchDataTask();
+                        fdt.execute(pushshiftUrl);
                         // displayAlert(0) is called in onPostExecute()
                     }
                     else {
@@ -229,10 +247,11 @@ public class HandleLinkActivity extends AppCompatActivity {
                 else
                     authorTV.setText(R.string.deleted);
 
-                @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-                String time = sdf.format(new Date(Long.parseLong(parsedData.get(5)) * 1000));
-
+                String time = (DateUtils.getRelativeDateTimeString(activity,
+                        Long.parseLong(parsedData.get(5)) * 1000,
+                        DateUtils.MINUTE_IN_MILLIS,
+                        DateUtils.DAY_IN_MILLIS,
+                        DateUtils.FORMAT_ABBREV_RELATIVE)).toString();
                 timeTV.setText(time);
 
                 if (parsedData.get(0).equals("[deleted]")) // removed too quickly to be archived
@@ -463,7 +482,6 @@ public class HandleLinkActivity extends AppCompatActivity {
                     Log.e(TAG, "No data found on pushshift.");
                     displayAlert(-7);
                 }
-
             }
         }
 
@@ -508,6 +526,12 @@ public class HandleLinkActivity extends AppCompatActivity {
             } catch(Exception e) {
                 Log.e(TAG, "Error parsing data: " + e.getMessage());
             }
+        }
+
+        @Override
+        protected void onCancelled() {
+            super.onCancelled();
+            Log.i(TAG, "FetchDataTask canceled.");
         }
     }
 }

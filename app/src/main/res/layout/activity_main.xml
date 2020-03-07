@@ -28,14 +28,18 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
+            android:textAlignment="center"
             android:textSize="16sp"
             android:textColor="#000000"
             android:text="@string/main_intro"/>
 
         <TextView
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="32dp"
+            android:layout_marginHorizontal="72dp"
+            android:layout_marginVertical="16dp"
+            android:layout_gravity="center_horizontal"
+            android:textStyle="bold"
             android:textSize="16sp"
             android:textColor="#000000"
             android:text="@string/main_instructions"/>
@@ -55,6 +59,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:text="@string/button"
+            android:backgroundTint="@color/colorPrimary"
+            android:textColor="#fff"
             android:onClick="buttonClick"/>
 
     </LinearLayout>

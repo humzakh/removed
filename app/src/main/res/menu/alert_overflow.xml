@@ -19,23 +19,22 @@
 
     <group android:id="@+id/group2">
         <item
+            android:id="@+id/more_details"
+            android:title="@string/more_details"
+            app:showAsAction="never"
+            android:orderInCategory="3"/>
+
+        <item
             android:id="@+id/view_on_reddit"
             android:title="@string/view_on_reddit"
             app:showAsAction="never"
-            android:orderInCategory="3"/>
+            android:orderInCategory="4"/>
 
         <item
             android:id="@+id/view_on_removeddit"
             android:title="@string/view_on_removeddit"
             app:showAsAction="never"
-            android:orderInCategory="4"/>
-
-        <item
-            android:id="@+id/more_details"
-            android:title="@string/more_details"
-            app:showAsAction="never"
             android:orderInCategory="5"/>
-
     </group>
 
 </menu>
