@@ -22,7 +22,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/author"
-                android:layout_weight="1"/>
+                android:layout_weight="2"/>
 
             <TextView
                 android:layout_width="match_parent"
@@ -44,7 +44,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/score"
-                android:layout_weight="1"/>
+                android:layout_weight="2"/>
 
             <TextView
                 android:layout_width="match_parent"
@@ -66,7 +66,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/subreddit"
                 android:minLines="2"
-                android:layout_weight="1"/>
+                android:layout_weight="2"/>
 
             <TextView
                 android:layout_width="match_parent"
@@ -88,7 +88,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/submitted"
-                android:layout_weight="1"/>
+                android:layout_weight="2"/>
 
             <TextView
                 android:layout_width="match_parent"
@@ -111,7 +111,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/archived"
                 android:minLines="2"
-                android:layout_weight="1"/>
+                android:layout_weight="2"/>
 
             <TextView
                 android:layout_width="match_parent"
@@ -133,7 +133,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/authorID"
-                android:layout_weight="1"/>
+                android:layout_weight="2"/>
 
             <TextView
                 android:layout_width="match_parent"
@@ -155,7 +155,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/commentID"
-                android:layout_weight="1"/>
+                android:layout_weight="2"/>
 
             <TextView
                 android:layout_width="match_parent"
@@ -177,7 +177,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/parentID"
-                android:layout_weight="1"/>
+                android:layout_weight="2"/>
 
             <TextView
                 android:layout_width="match_parent"
@@ -199,7 +199,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/linkID"
-                android:layout_weight="1"/>
+                android:layout_weight="2"/>
 
             <TextView
                 android:layout_width="match_parent"
@@ -221,7 +221,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/subredditID"
-                android:layout_weight="1"
+                android:layout_weight="2"
                 android:minLines="2"/>
 
             <TextView

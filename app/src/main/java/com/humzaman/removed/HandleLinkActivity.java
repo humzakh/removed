@@ -241,7 +241,7 @@ public class HandleLinkActivity extends AppCompatActivity {
 
                 if (!parsedData.get(0).equals("[deleted]")) { // open user profile
                     authorTV.setMovementMethod(LinkMovementMethod.getInstance());
-                    String html = "<a href='https://www.reddit.com/u/" + parsedData.get(0) + "'>/u/" + parsedData.get(0) + "</a>";
+                    String html = "<a href='https://www.reddit.com/user/" + parsedData.get(0) + "'>/u/" + parsedData.get(0) + "</a>";
                     authorTV.setText(HtmlCompat.fromHtml(html, HtmlCompat.FROM_HTML_MODE_LEGACY));
                 }
                 else
