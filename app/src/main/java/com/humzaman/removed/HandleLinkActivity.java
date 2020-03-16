@@ -56,6 +56,18 @@ public class HandleLinkActivity extends AppCompatActivity {
     // parsedData: [author, body, score, id, permalink, created_utc, retrieved_on, subreddit, subreddit_id, link_id, parent_id, author_fullname]
     private List<String> parsedData;
     private ProgressDialog progressDialog;
+    private enum ResultCode {
+        SUBMISSION,
+        VALID_COMMENT,
+        INVALID_COMMENT,
+        NOT_REDDIT_LINK,
+        NOT_URL,
+        MORE_DETAILS,
+        ABOUT,
+        FAILED,
+        NO_INTERNET,
+        NO_DATA_FOUND
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,7 +115,7 @@ public class HandleLinkActivity extends AppCompatActivity {
                     // I'll work on this later.
                     // ...maybe
 
-                    displayAlert(-1);
+                    displayAlert(ResultCode.SUBMISSION);
                 }
                 else if (pathSegments.size() == 6) { // comment
                     String id = pathSegments.get(5);
@@ -111,11 +123,12 @@ public class HandleLinkActivity extends AppCompatActivity {
                     pushshiftUrl = "https://api.pushshift.io/reddit/search/comment/?ids=" + id;
                     Log.i(TAG, "Pushshift URL: " + pushshiftUrl);
 
-                    new FetchDataTask().execute(pushshiftUrl);
-                    // displayAlert(0) is called in onPostExecute()
+                    fdt = new FetchDataTask();
+                    fdt.execute(pushshiftUrl);
+                    // displayAlert(ResultCode.VALID_COMMENT) will be called in onPostExecute()
                 }
                 else if (pathSegments.get(0).equals("comments")) {
-                    if (pathSegments.size() == 4) {
+                    if (pathSegments.size() == 4) { // reddit.com/comments/{submission id}/{submission title}/{comment id}/
                         String id = pathSegments.get(3);
                         Log.i(TAG, "Comment ID: " + id);
                         pushshiftUrl = "https://api.pushshift.io/reddit/search/comment/?ids=" + id;
@@ -123,31 +136,31 @@ public class HandleLinkActivity extends AppCompatActivity {
 
                         fdt = new FetchDataTask();
                         fdt.execute(pushshiftUrl);
-                        // displayAlert(0) is called in onPostExecute()
+                        // displayAlert(ResultCode.VALID_COMMENT) will be called in onPostExecute()
                     }
                     else {
                         String id = pathSegments.get(1);
                         Log.i(TAG, "Submission ID: " + id);
-                        displayAlert(-1);
+                        displayAlert(ResultCode.SUBMISSION);
                     }
                 }
                 else {
                     Log.e(TAG, "Not a valid comment link.");
-                    displayAlert(-2);
+                    displayAlert(ResultCode.INVALID_COMMENT);
                 }
             }
             else {
                 Log.e(TAG, "Not a reddit link. (" + host + ")");
-                displayAlert(-3);
+                displayAlert(ResultCode.NOT_REDDIT_LINK);
             }
         }
         else {
             Log.e(TAG, "Not a valid URL.");
-            displayAlert(-4);
+            displayAlert(ResultCode.NOT_URL);
         }
     }
 
-    private void displayAlert(int code) {
+    private void displayAlert(ResultCode code) {
         LayoutInflater inflater = getLayoutInflater();
         @SuppressLint("InflateParams") View dialogTitle = inflater.inflate(R.layout.alert_title, null);
         Toolbar toolbar = dialogTitle.findViewById(R.id.toolbar);
@@ -169,8 +182,8 @@ public class HandleLinkActivity extends AppCompatActivity {
                 });
 
         switch (code) {
-            case 0: { // valid comment link
-                @SuppressLint("InflateParams") View dialogView = inflater.inflate(R.layout.alert_view, null);
+            case VALID_COMMENT: { // valid comment link
+                 @SuppressLint("InflateParams") View dialogView = inflater.inflate(R.layout.alert_view, null);
                 builder.setView(dialogView)
                         .setPositiveButton("Close", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
@@ -192,16 +205,13 @@ public class HandleLinkActivity extends AppCompatActivity {
                         });
 
                 String removeddit = intentString;
-                if (removeddit.contains("old.reddit.com")) {
+                if (removeddit.contains("old.reddit.com"))
                     removeddit = removeddit.replaceFirst("old[.]", "");
-                }
                 final String finalRemoveddit = removeddit.replaceFirst("reddit", "removeddit");
 
-                toolbar.setOnMenuItemClickListener(
-                        new Toolbar.OnMenuItemClickListener() {
+                toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
                             @Override
                             public boolean onMenuItemClick(MenuItem item) {
-
                                 switch (item.getItemId()) {
                                     case R.id.view_on_reddit: {
                                         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(parsedData.get(4)));
@@ -213,25 +223,18 @@ public class HandleLinkActivity extends AppCompatActivity {
                                         startActivity(browserIntent);
                                         break;
                                     }
-                                    case R.id.more_details:
-                                        displayAlert(1);
-                                        break;
-
-                                    case R.id.settings: {
-
+                                    case R.id.more_details: {
+                                        displayAlert(ResultCode.MORE_DETAILS);
                                         break;
                                     }
-
+                                    case R.id.settings: { break; }
                                     case R.id.about: {
-                                        displayAlert(7);
+                                        displayAlert(ResultCode.ABOUT);
                                         break;
                                     }
-
                                 }
-
                                 return true;
-                            }
-                        });
+                            }});
                 toolbar.inflateMenu(R.menu.alert_overflow);
                 MenuCompat.setGroupDividerEnabled(toolbar.getMenu(), true);
 
@@ -245,7 +248,7 @@ public class HandleLinkActivity extends AppCompatActivity {
                     authorTV.setText(HtmlCompat.fromHtml(html, HtmlCompat.FROM_HTML_MODE_LEGACY));
                 }
                 else
-                    authorTV.setText(R.string.deleted);
+                    authorTV.setText(parsedData.get(0));
 
                 String time = (DateUtils.getRelativeDateTimeString(activity,
                         Long.parseLong(parsedData.get(5)) * 1000,
@@ -254,7 +257,8 @@ public class HandleLinkActivity extends AppCompatActivity {
                         DateUtils.FORMAT_ABBREV_RELATIVE)).toString();
                 timeTV.setText(time);
 
-                if (parsedData.get(0).equals("[deleted]")) // removed too quickly to be archived
+                // archived username [deleted] tells us the comment couldn't be archived in time
+                if (parsedData.get(0).equals("[deleted]"))
                     bodyTV.setText(R.string.removed_quick);
                 else {
                     bodyTV.setMovementMethod(LinkMovementMethod.getInstance()); // make links clickable
@@ -272,8 +276,26 @@ public class HandleLinkActivity extends AppCompatActivity {
 
                 break;
             }
+            case SUBMISSION: { // submission link
+                String removeddit = intentString;
+                if (removeddit.contains("old.reddit.com")) {
+                    removeddit = removeddit.replaceFirst("old[.]", "");
+                }
+                final String finalRemoveddit = removeddit.replaceFirst("reddit", "removeddit");
 
-            case 1: { // more details dialog
+                builder.setMessage("Submission links are not currently supported.\n\nTap \"Removeddit\" to view the submission on removeddit.com, or try again with a direct link to a comment.")
+                        .setNeutralButton("Removeddit", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int i) {
+                                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(finalRemoveddit));
+                                startActivity(browserIntent);
+                                dialog.dismiss();
+                                finish();
+                            }
+                        });
+                break;
+            }
+            case MORE_DETAILS: { // more details dialog
                 toolbar.setTitle("More details");
 
                 @SuppressLint("InflateParams") View mdDialogView = inflater.inflate(R.layout.alert_moredetails, null);
@@ -288,7 +310,6 @@ public class HandleLinkActivity extends AppCompatActivity {
                             @Override
                             public void onCancel(DialogInterface dialog) {
                                 dialog.dismiss();
-                                //finish();
                             }
                         });
 
@@ -334,8 +355,7 @@ public class HandleLinkActivity extends AppCompatActivity {
 
                 break;
             }
-
-            case 7: { // about dialog
+            case ABOUT: { // about dialog
                 builder.setCustomTitle(null)
                         .setTitle("About [removed]")
                         .setIcon(R.mipmap.ic_launcher)
@@ -349,49 +369,24 @@ public class HandleLinkActivity extends AppCompatActivity {
                             @Override
                             public void onCancel(DialogInterface dialog) {
                                 dialog.dismiss();
-                                //finish();
-                            }
-                        });
-
-                break;
-            }
-
-            case -1: { // submission link
-                String removeddit = intentString;
-                if (removeddit.contains("old.reddit.com")) {
-                    removeddit = removeddit.replaceFirst("old[.]", "");
-                }
-                final String finalRemoveddit = removeddit.replaceFirst("reddit", "removeddit");
-
-                builder.setMessage("Submission links are not currently supported.\n\nTap \"Removeddit\" to view the submission on removeddit.com, or try again with a direct link to a comment.")
-                        .setNeutralButton("Removeddit", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int i) {
-                                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(finalRemoveddit));
-                                startActivity(browserIntent);
-
-                                dialog.dismiss();
-                                finish();
                             }
                         });
                 break;
             }
-            case -4: // not a link
+
+            /* Error result codes */
+            case NOT_URL: // not a link
                 builder.setMessage("Error: Please share a direct link, not the comment text.");
                 break;
-
-            case -5: // failed to retrieve data
+            case FAILED: // failed to retrieve data
                 builder.setMessage("Error: Failed to retrieve data from pushshift.io");
                 break;
-
-            case -6: // No internet
-                builder.setMessage("Error: Check internet connection");
+            case NO_INTERNET: // No internet
+                builder.setMessage("Error: Check internet connection.");
                 break;
-
-            case -7: // No data found on pushshift
-                builder.setMessage("Error: No data found for this comment on pushshift.io");
+            case NO_DATA_FOUND: // No data found on pushshift
+                builder.setMessage("No archived data found for this comment.");
                 break;
-
             default: // invalid link
                 builder.setMessage("Error: Invalid link");
                 break;
@@ -462,12 +457,12 @@ public class HandleLinkActivity extends AppCompatActivity {
             if (dataFetched == null) {
                 if (progressDialog != null && progressDialog.isShowing())
                     progressDialog.dismiss();
-                displayAlert(-6);
+                displayAlert(ResultCode.NO_INTERNET);
             }
             else if (dataFetched.equals("FAILED")) {
                 if (progressDialog != null && progressDialog.isShowing())
                     progressDialog.dismiss();
-                displayAlert(-5);
+                displayAlert(ResultCode.FAILED);
             }
             else {
                 //parse the JSON data and then display
@@ -477,10 +472,10 @@ public class HandleLinkActivity extends AppCompatActivity {
                     progressDialog.dismiss();
 
                 if (parsedData.size() != 0)
-                    displayAlert(0);
+                    displayAlert(ResultCode.VALID_COMMENT);
                 else {
                     Log.e(TAG, "No data found on pushshift.");
-                    displayAlert(-7);
+                    displayAlert(ResultCode.NO_DATA_FOUND);
                 }
             }
         }
