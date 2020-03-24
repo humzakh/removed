@@ -51,6 +51,7 @@ public class HandleLinkActivity extends AppCompatActivity {
     private static final String TAG = "HandleLinkActivity";
     private Activity activity;
     private String intentString;
+    private String id;
     private String pushshiftUrl;
     private FetchDataTask fdt; // lol this variable name is excellent. #FDT
     // parsedData: [author, body, score, id, permalink, created_utc, retrieved_on, subreddit, subreddit_id, link_id, parent_id, author_fullname]
@@ -66,7 +67,8 @@ public class HandleLinkActivity extends AppCompatActivity {
         ABOUT,
         FAILED,
         NO_INTERNET,
-        NO_DATA_FOUND
+        NO_DATA_FOUND,
+        ERROR_RESPONSE
     }
 
     @Override
@@ -108,17 +110,17 @@ public class HandleLinkActivity extends AppCompatActivity {
 
                 // URL structure: reddit.com/r/{subreddit}/comments/{submission id}/{submission title}/{comment id}/
                 if (pathSegments.size() == 5) { // submission
-                    String id = pathSegments.get(3);
+                    id = pathSegments.get(3);
                     Log.i(TAG, "Submission ID: " + id);
 
                     // TODO: submission stuff
                     // I'll work on this later.
                     // ...maybe
 
-                    displayAlert(ResultCode.SUBMISSION);
+                    displayAlert(ResultCode.SUBMISSION, null);
                 }
                 else if (pathSegments.size() == 6) { // comment
-                    String id = pathSegments.get(5);
+                    id = pathSegments.get(5);
                     Log.i(TAG, "Comment ID: " + id);
                     pushshiftUrl = "https://api.pushshift.io/reddit/search/comment/?ids=" + id;
                     Log.i(TAG, "Pushshift URL: " + pushshiftUrl);
@@ -129,7 +131,7 @@ public class HandleLinkActivity extends AppCompatActivity {
                 }
                 else if (pathSegments.get(0).equals("comments")) {
                     if (pathSegments.size() == 4) { // reddit.com/comments/{submission id}/{submission title}/{comment id}/
-                        String id = pathSegments.get(3);
+                        id = pathSegments.get(3);
                         Log.i(TAG, "Comment ID: " + id);
                         pushshiftUrl = "https://api.pushshift.io/reddit/search/comment/?ids=" + id;
                         Log.i(TAG, "Pushshift URL: " + pushshiftUrl);
@@ -139,28 +141,28 @@ public class HandleLinkActivity extends AppCompatActivity {
                         // displayAlert(ResultCode.VALID_COMMENT) will be called in onPostExecute()
                     }
                     else {
-                        String id = pathSegments.get(1);
+                        id = pathSegments.get(1);
                         Log.i(TAG, "Submission ID: " + id);
-                        displayAlert(ResultCode.SUBMISSION);
+                        displayAlert(ResultCode.SUBMISSION, null);
                     }
                 }
                 else {
                     Log.e(TAG, "Not a valid comment link.");
-                    displayAlert(ResultCode.INVALID_COMMENT);
+                    displayAlert(ResultCode.INVALID_COMMENT, null);
                 }
             }
             else {
                 Log.e(TAG, "Not a reddit link. (" + host + ")");
-                displayAlert(ResultCode.NOT_REDDIT_LINK);
+                displayAlert(ResultCode.NOT_REDDIT_LINK, null);
             }
         }
         else {
             Log.e(TAG, "Not a valid URL.");
-            displayAlert(ResultCode.NOT_URL);
+            displayAlert(ResultCode.NOT_URL, null);
         }
     }
 
-    private void displayAlert(ResultCode code) {
+    private void displayAlert(ResultCode code, String resultCode) {
         LayoutInflater inflater = getLayoutInflater();
         @SuppressLint("InflateParams") View dialogTitle = inflater.inflate(R.layout.alert_title, null);
         Toolbar toolbar = dialogTitle.findViewById(R.id.toolbar);
@@ -224,12 +226,12 @@ public class HandleLinkActivity extends AppCompatActivity {
                                         break;
                                     }
                                     case R.id.more_details: {
-                                        displayAlert(ResultCode.MORE_DETAILS);
+                                        displayAlert(ResultCode.MORE_DETAILS, null);
                                         break;
                                     }
                                     case R.id.settings: { break; }
                                     case R.id.about: {
-                                        displayAlert(ResultCode.ABOUT);
+                                        displayAlert(ResultCode.ABOUT, null);
                                         break;
                                     }
                                 }
@@ -261,7 +263,7 @@ public class HandleLinkActivity extends AppCompatActivity {
                 if (parsedData.get(0).equals("[deleted]"))
                     bodyTV.setText(R.string.removed_quick);
                 else {
-                    bodyTV.setMovementMethod(LinkMovementMethod.getInstance()); // make links clickable
+                    bodyTV.setMovementMethod(LinkMovementMethod.getInstance()); // make links in body clickable
 
                     // reddit comments use markdown format.
                     // obtain an instance of Markwon
@@ -316,7 +318,7 @@ public class HandleLinkActivity extends AppCompatActivity {
                 @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 
-                String author = "/u/" + parsedData.get(0);
+                String author = (parsedData.get(0).equals("[deleted]") ? "[deleted]" : "/u/" + parsedData.get(0));
                 String score =  (parsedData.get(2).equals("null") ? "null" : parsedData.get(2) + " " + ((Integer.parseInt(parsedData.get(2)) == 1) ? "point" : "points"));
                 String subreddit = "/r/" + parsedData.get(7);
                 String submitted = (parsedData.get(5).equals("null") ? "null" : sdf.format(new Date(Long.parseLong(parsedData.get(5)) * 1000)));
@@ -387,8 +389,20 @@ public class HandleLinkActivity extends AppCompatActivity {
             case NO_DATA_FOUND: // No data found on pushshift
                 builder.setMessage("No archived data found for this comment.");
                 break;
+            case ERROR_RESPONSE: // Pushshift error response
+                builder.setMessage("Error " + resultCode + ": Could not reach Pushshift.\n\nTheir servers may be down.\nCheck pushshift.io for updates, or try again later.")
+                        .setNeutralButton("Pushshift.io", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int i) {
+                                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://pushshift.io"));
+                                startActivity(browserIntent);
+                                dialog.dismiss();
+                                finish();
+                            }
+                        });
+                break;
             default: // invalid link
-                builder.setMessage("Error: Invalid link");
+                builder.setMessage("Error: Invalid link.");
                 break;
         }
 
@@ -400,7 +414,7 @@ public class HandleLinkActivity extends AppCompatActivity {
     // idk the right thing to do about this memory leak warning,
     // so I'm just gonna ignore it and hope nothing bad happens lol
     @SuppressLint("StaticFieldLeak")
-    private class FetchDataTask extends AsyncTask<String, Void, String> {
+    private class FetchDataTask extends AsyncTask<String, Void, List<String>> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -420,31 +434,71 @@ public class HandleLinkActivity extends AppCompatActivity {
         }
 
         @Override
-        protected String doInBackground(String... params) {
-            String result;
-            URL url;
+        protected List<String> doInBackground(String... params) {
+            Log.i(TAG, "Fetching data.");
+            List<String> result = new ArrayList<>();
             HttpURLConnection urlConnection = null;
-            try {
-                url = new URL(params[0]);
-                urlConnection = (HttpURLConnection) url.openConnection();
-                InputStream inputStream = urlConnection.getInputStream();
+            HttpURLConnection urlConnectionScore = null;
 
-                // convert inputStream to string
-                if (inputStream != null) {
-                    result = convertInputStreamToString(inputStream);
-                    Log.i(TAG, "Data received: " + result);
+            try {
+                URL url = new URL(params[0]);
+                urlConnection = (HttpURLConnection) url.openConnection();
+                int pushshiftResponseCode = urlConnection.getResponseCode();
+
+                if (pushshiftResponseCode == HttpURLConnection.HTTP_OK) {
+                    Log.i(TAG, "Response from Pushshift: " + pushshiftResponseCode);
+                    InputStream inputStream = urlConnection.getInputStream();
+
+                    // convert inputStream to string
+                    if (inputStream != null) {
+                        result.add(convertInputStreamToString(inputStream)); // 0
+                        Log.i(TAG, "Pushshift data received: " + result.get(0));
+
+                        // get current comment score from reddit
+                        URL urlScore = new URL("https://api.reddit.com/api/info/?id=t1_" + id);
+                        urlConnectionScore = (HttpURLConnection) urlScore.openConnection();
+                        int redditResponseCode = urlConnectionScore.getResponseCode();
+
+                        if (redditResponseCode == HttpURLConnection.HTTP_OK) {
+                            Log.i(TAG, "Response from reddit: " + redditResponseCode);
+                            InputStream inputStreamScore = urlConnectionScore.getInputStream();
+
+                            if (inputStreamScore != null) {
+                                result.add(convertInputStreamToString(inputStreamScore)); // 1
+                                Log.i(TAG, "reddit data received: " + result.get(1));
+                            }
+                            else {
+                                Log.e(TAG, "Failed to retrieve data from reddit.");
+                                result.add("FAILED"); // 1
+                            }
+                        }
+                        else {
+                            Log.e(TAG, "Response from reddit: " + redditResponseCode);
+                            result.add("FAILED"); // 1
+                        }
+                    }
+                    else {
+                        Log.e(TAG, "Failed to retrieve data from Pushshift.");
+                        result.add("FAILED"); // 0
+                    }
+
+                    return result;
                 }
                 else {
-                    result = "FAILED";
-                    Log.e(TAG, "Failed to retrieve data.");
+                    Log.e(TAG, "Response from Pushshift: " + pushshiftResponseCode);
+                    result.add("ERROR"); // 0
+                    result.add(String.valueOf(pushshiftResponseCode)); // 1
+                    return result;
                 }
-
-                return result;
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
                 if (urlConnection != null) {
                     urlConnection.disconnect();
+                }
+
+                if (urlConnectionScore != null) {
+                    urlConnectionScore.disconnect();
                 }
             }
 
@@ -453,16 +507,21 @@ public class HandleLinkActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPostExecute(String dataFetched) {
+        protected void onPostExecute(List<String> dataFetched) {
             if (dataFetched == null) {
                 if (progressDialog != null && progressDialog.isShowing())
                     progressDialog.dismiss();
-                displayAlert(ResultCode.NO_INTERNET);
+                displayAlert(ResultCode.NO_INTERNET, null);
             }
-            else if (dataFetched.equals("FAILED")) {
+            else if (dataFetched.get(0).equals("FAILED")) {
                 if (progressDialog != null && progressDialog.isShowing())
                     progressDialog.dismiss();
-                displayAlert(ResultCode.FAILED);
+                displayAlert(ResultCode.FAILED, null);
+            }
+            else if (dataFetched.get(0).equals("ERROR")) {
+                if (progressDialog != null && progressDialog.isShowing())
+                    progressDialog.dismiss();
+                displayAlert(ResultCode.ERROR_RESPONSE, dataFetched.get(1));
             }
             else {
                 //parse the JSON data and then display
@@ -472,10 +531,10 @@ public class HandleLinkActivity extends AppCompatActivity {
                     progressDialog.dismiss();
 
                 if (parsedData.size() != 0)
-                    displayAlert(ResultCode.VALID_COMMENT);
+                    displayAlert(ResultCode.VALID_COMMENT, null);
                 else {
                     Log.e(TAG, "No data found on pushshift.");
-                    displayAlert(ResultCode.NO_DATA_FOUND);
+                    displayAlert(ResultCode.NO_DATA_FOUND, null);
                 }
             }
         }
@@ -491,33 +550,40 @@ public class HandleLinkActivity extends AppCompatActivity {
             return result.toString();
         }
 
-        private void parseJSON(String data) {
+        private void parseJSON(List<String> data) {
             try {
-                JSONObject mainObject = new JSONObject(data);
-                Log.i(TAG, "Main object: " + mainObject.toString());
-                JSONArray dataArray = mainObject.getJSONArray("data");
-                Log.i(TAG, "Data array: " + dataArray.toString());
+                JSONArray pushshiftDataArray = (new JSONObject(data.get(0))).getJSONArray("data");
+                Log.i(TAG, "Pushshift data array: " + pushshiftDataArray.toString());
 
                 parsedData = new ArrayList<>();
 
-                for (int i = 0; i < dataArray.length(); i++) {
-                    JSONObject item = dataArray.getJSONObject(i);
+                if (pushshiftDataArray.length() > 0) {
+                    JSONObject pushshiftObject = pushshiftDataArray.getJSONObject(0);
 
-                    parsedData.add(item.has("author") ? item.getString("author") : "null");                   // 0
-                    parsedData.add(item.has("body") ? item.getString("body") : "null");                       // 1
-                    parsedData.add(item.has("score") ? item.getString("score") : "null");                     // 2
-                    parsedData.add(item.has("id") ? item.getString("id") : "null");                           // 3
-                    parsedData.add(item.has("permalink") ?                                                          // 4
-                            "https://www.reddit.com" + item.getString("permalink") : intentString);
-                    parsedData.add(item.has("created_utc") ? item.getString("created_utc") : "null");         // 5
-                    parsedData.add(item.has("retrieved_on") ? item.getString("retrieved_on") : "null");       // 6
-                    parsedData.add(item.has("subreddit") ? item.getString("subreddit") : "null");             // 7
-                    parsedData.add(item.has("subreddit_id") ? item.getString("subreddit_id") : "null");       // 8
-                    parsedData.add(item.has("link_id") ? item.getString("link_id") : "null");                 // 9
-                    parsedData.add(item.has("parent_id") ? item.getString("parent_id") : "null");             // 10
-                    parsedData.add(item.has("author_fullname") ? item.getString("author_fullname") : "null"); // 11
+                    parsedData.add(pushshiftObject.has("author") ? pushshiftObject.getString("author") : "null");                   // 0
+                    parsedData.add(pushshiftObject.has("body") ? pushshiftObject.getString("body") : "null");                       // 1
+                    parsedData.add(pushshiftObject.has("score") ? pushshiftObject.getString("score") : "null");                     // 2
+                    parsedData.add(pushshiftObject.has("id") ? pushshiftObject.getString("id") : "null");                           // 3
+                    parsedData.add(pushshiftObject.has("permalink") ?                                                                     // 4
+                            "https://www.reddit.com" + pushshiftObject.getString("permalink") : intentString);
+                    parsedData.add(pushshiftObject.has("created_utc") ? pushshiftObject.getString("created_utc") : "null");         // 5
+                    parsedData.add(pushshiftObject.has("retrieved_on") ? pushshiftObject.getString("retrieved_on") : "null");       // 6
+                    parsedData.add(pushshiftObject.has("subreddit") ? pushshiftObject.getString("subreddit") : "null");             // 7
+                    parsedData.add(pushshiftObject.has("subreddit_id") ? pushshiftObject.getString("subreddit_id") : "null");       // 8
+                    parsedData.add(pushshiftObject.has("link_id") ? pushshiftObject.getString("link_id") : "null");                 // 9
+                    parsedData.add(pushshiftObject.has("parent_id") ? pushshiftObject.getString("parent_id") : "null");             // 10
+                    parsedData.add(pushshiftObject.has("author_fullname") ? pushshiftObject.getString("author_fullname") : "null"); // 11
+                    Log.i(TAG, "Parsed Pushshift data: " + parsedData.toString());
+
+                    // current comment score from reddit
+                    if (!data.get(1).equals("FAILED")) {
+                        JSONObject redditObject = (new JSONObject(data.get(1))).getJSONObject("data").getJSONArray("children").getJSONObject(0).getJSONObject("data");
+                        String score = redditObject.getString("score");
+
+                        Log.i(TAG, "Score from reddit: " + score);
+                        parsedData.set(2, score);
+                    }
                 }
-                Log.i(TAG, "Parsed data: " + parsedData.toString());
             } catch(Exception e) {
                 Log.e(TAG, "Error parsing data: " + e.getMessage());
             }

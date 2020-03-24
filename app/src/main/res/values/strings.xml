@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">[removed]</string>
+    <string name="app_name_test">[removed] test</string>
 
     <string name="view_on_reddit">View on reddit</string>
     <string name="view_on_removeddit">View on Removeddit</string>
