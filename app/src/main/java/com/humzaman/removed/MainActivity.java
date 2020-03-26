@@ -71,10 +71,10 @@ public class MainActivity extends AppCompatActivity {
     public void buttonClick(View view) {
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_SEND);
-        intent.putExtra(Intent.EXTRA_TEXT,"https://www.reddit.com/r/removed_test/comments/f3mebi/title/fhk7w3k/");
+        intent.putExtra(Intent.EXTRA_TEXT,"https://www.reddit.com/r/removed_test/comments/f3pm08/_/fhk7w3k/");
 
         // test link for [removed too quickly to be archived]
-        //intent.putExtra(Intent.EXTRA_TEXT,"https://www.reddit.com/r/removed_test/comments/f3mebi/title/fis1ckk/");
+        //intent.putExtra(Intent.EXTRA_TEXT,"https://www.reddit.com/r/removed_test/comments/f3mebi/_/fis1ckk/");
 
         intent.setType("text/plain");
 

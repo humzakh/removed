@@ -250,7 +250,7 @@ public class HandleLinkActivity extends AppCompatActivity {
                     authorTV.setText(HtmlCompat.fromHtml(html, HtmlCompat.FROM_HTML_MODE_LEGACY));
                 }
                 else
-                    authorTV.setText(parsedData.get(0));
+                    authorTV.setText(R.string.deleted);
 
                 String time = (DateUtils.getRelativeDateTimeString(activity,
                         Long.parseLong(parsedData.get(5)) * 1000,
@@ -377,17 +377,17 @@ public class HandleLinkActivity extends AppCompatActivity {
             }
 
             /* Error result codes */
-            case NOT_URL: // not a link
-                builder.setMessage("Error: Please share a direct link, not the comment text.");
+            case NOT_URL: // not a URL
+                builder.setMessage("Error: not a valid URL.\n\nPlease share a direct link, not the comment text.");
                 break;
             case FAILED: // failed to retrieve data
-                builder.setMessage("Error: Failed to retrieve data from pushshift.io");
+                builder.setMessage("Error: failed to retrieve data from pushshift.io");
                 break;
-            case NO_INTERNET: // No internet
-                builder.setMessage("Error: Check internet connection.");
+            case NO_INTERNET: // no internet
+                builder.setMessage("Error: check internet connection.");
                 break;
-            case NO_DATA_FOUND: // No data found on pushshift
-                builder.setMessage("No archived data found for this comment.");
+            case NO_DATA_FOUND: // no data found on Pushshift
+                builder.setMessage(R.string.not_archived);
                 break;
             case ERROR_RESPONSE: // Pushshift error response
                 builder.setMessage("Error " + resultCode + ": Could not reach Pushshift.\n\nTheir servers may be down.\nCheck pushshift.io for updates, or try again later.")
@@ -402,7 +402,7 @@ public class HandleLinkActivity extends AppCompatActivity {
                         });
                 break;
             default: // invalid link
-                builder.setMessage("Error: Invalid link.");
+                builder.setMessage("Error: invalid link.");
                 break;
         }
 
@@ -413,11 +413,13 @@ public class HandleLinkActivity extends AppCompatActivity {
 
     // idk the right thing to do about this memory leak warning,
     // so I'm just gonna ignore it and hope nothing bad happens lol
+    // Bad Coding Practices: Exhibit A
     @SuppressLint("StaticFieldLeak")
     private class FetchDataTask extends AsyncTask<String, Void, List<String>> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            Log.i(TAG, "onPreExecute() Showing ProgressDialog");
             progressDialog = new ProgressDialog(activity);
             progressDialog.setCancelable(false);
             progressDialog.setMessage("Unremoving...");
@@ -435,7 +437,7 @@ public class HandleLinkActivity extends AppCompatActivity {
 
         @Override
         protected List<String> doInBackground(String... params) {
-            Log.i(TAG, "Fetching data.");
+            Log.i(TAG, "doInBackground() Fetching data.");
             List<String> result = new ArrayList<>();
             HttpURLConnection urlConnection = null;
             HttpURLConnection urlConnectionScore = null;
@@ -508,6 +510,8 @@ public class HandleLinkActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(List<String> dataFetched) {
+            Log.i(TAG, "onPostExecute()");
+
             if (dataFetched == null) {
                 if (progressDialog != null && progressDialog.isShowing())
                     progressDialog.dismiss();

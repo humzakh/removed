@@ -19,7 +19,7 @@
             android:theme="@style/Theme.Transparent"
             android:excludeFromRecents="true"
             android:launchMode="singleTop">
-            <intent-filter android:label="[removed]">
+            <intent-filter android:label="@string/app_name">
                 <action android:name="android.intent.action.SEND" />
 
                 <category android:name="android.intent.category.DEFAULT" />
