@@ -4,11 +4,11 @@ android {
     compileSdkVersion 29
     buildToolsVersion "29.0.2"
     defaultConfig {
-        applicationId "com.humzaman.removed.test"
+        applicationId "com.humzaman.removed"
         minSdkVersion 22
         targetSdkVersion 29
-        versionCode 8
-        versionName "1.4.2"
+        versionCode 9
+        versionName "1.5"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -33,6 +33,8 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
     implementation "io.noties.markwon:core:4.3.0"
+    implementation "io.noties.markwon:linkify:4.3.0"
     implementation "com.squareup.retrofit2:retrofit:2.8.1"
     implementation 'com.squareup.retrofit2:converter-gson:2.8.1'
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
 }

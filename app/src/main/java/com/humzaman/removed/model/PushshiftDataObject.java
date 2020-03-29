@@ -2,7 +2,7 @@ package com.humzaman.removed.model;
 
 import java.util.List;
 
-public class Api {
+public class PushshiftDataObject {
     private List<CommentData> data;
 
     public List<CommentData> getData() {

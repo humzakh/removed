@@ -39,26 +39,13 @@ public class MainActivity extends AppCompatActivity {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("About [removed]")
                     .setIcon(R.mipmap.ic_launcher)
-                    .setOnCancelListener(new DialogInterface.OnCancelListener() {
-                        @Override
-                        public void onCancel(DialogInterface dialog) {
-                            dialog.dismiss();
-                            finish();
-                        }
+                    .setOnCancelListener(dialog -> {
+                        dialog.dismiss();
+                        finish();
                     })
                     .setView(R.layout.alert_about)
-                    .setPositiveButton("Close", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            dialog.dismiss();
-                        }
-                    })
-                    .setOnCancelListener(new DialogInterface.OnCancelListener() {
-                        @Override
-                        public void onCancel(DialogInterface dialog) {
-                            dialog.dismiss();
-                            //finish();
-                        }
-                    });
+                    .setPositiveButton("Close", (dialog, id1) -> dialog.dismiss())
+                    .setOnCancelListener(DialogInterface::dismiss);
 
             AlertDialog alert = builder.create();
             alert.setCanceledOnTouchOutside(false);

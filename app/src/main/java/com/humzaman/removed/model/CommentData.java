@@ -1,7 +1,6 @@
 package com.humzaman.removed.model;
 
 public class CommentData {
-
     private String author;
     private String body;
     private String score;
@@ -30,8 +29,6 @@ public class CommentData {
         this.author_fullname = author_fullname;
     }
 
-
-    /* Getters and Setters */
     public String getAuthor() {
         return author;
     }

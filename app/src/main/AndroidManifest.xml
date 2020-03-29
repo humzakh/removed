@@ -8,18 +8,18 @@
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name_test"
+        android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup">
 
         <activity
-            android:name=".activity.HandleLinkActivity"
+            android:name=".activity.RemovedActivity"
             android:theme="@style/Theme.Transparent"
             android:excludeFromRecents="true"
             android:launchMode="singleTop">
-            <intent-filter android:label="@string/app_name_test">
+            <intent-filter android:label="@string/app_name">
                 <action android:name="android.intent.action.SEND" />
 
                 <category android:name="android.intent.category.DEFAULT" />

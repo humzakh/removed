@@ -12,6 +12,6 @@
         android:background="@null"
         android:minHeight="?attr/actionBarSize"
         android:theme="@style/Theme.Transparent"
-        app:title="[removed]" />
+        app:title="@string/app_name" />
 
 </LinearLayout>
