@@ -1,6 +1,5 @@
 package com.humzaman.removed.activity;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -13,6 +12,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.humzaman.removed.R;
+import com.humzaman.removed.util.BuildAlert;
+import com.humzaman.removed.util.ResultCode;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -36,21 +37,8 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         if (id == R.id.action_about) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("About [removed]")
-                    .setIcon(R.mipmap.ic_launcher)
-                    .setOnCancelListener(dialog -> {
-                        dialog.dismiss();
-                        finish();
-                    })
-                    .setView(R.layout.alert_about)
-                    .setPositiveButton("Close", (dialog, id1) -> dialog.dismiss())
-                    .setOnCancelListener(DialogInterface::dismiss);
-
-            AlertDialog alert = builder.create();
-            alert.setCanceledOnTouchOutside(false);
+            AlertDialog alert = (new BuildAlert(this, ResultCode.ABOUT)).build();
             alert.show();
-
             return true;
         }
 

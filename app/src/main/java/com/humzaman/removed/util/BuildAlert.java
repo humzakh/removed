@@ -41,12 +41,23 @@ public class BuildAlert {
     private String intentString;
     private CommentData commentData;
 
+    /**
+     * Initialize BuildAlert for generic alert dialog.
+     * @param activity Context to be passed to AlertDialog.Builder
+     * @param resultCode Determines which dialog to display.
+     */
     public BuildAlert(Activity activity, ResultCode resultCode) {
         this.activity = activity;
         this.resultCode = resultCode;
         this.inflater = this.activity.getLayoutInflater();
     }
 
+    /**
+     * Initialize BuildAlert for submission dialog or error dialog. (email intentString to dev).
+     * @param activity Context to be passed to AlertDialog.Builder
+     * @param resultCode Determines which dialog to display.
+     * @param intentString Used either for removeddit link (submission) or debugging (error).
+     */
     public BuildAlert(Activity activity, ResultCode resultCode, String intentString) {
         this.activity = activity;
         this.resultCode = resultCode;
@@ -54,6 +65,13 @@ public class BuildAlert {
         this.inflater = this.activity.getLayoutInflater();
     }
 
+    /**
+     * Initialize BuildAlert for valid comment dialog or more details dialog.
+     * @param activity Context to be passed to AlertDialog.Builder
+     * @param resultCode Determines which dialog to display.
+     * @param intentString Used for removeddit link.
+     * @param commentData Data fetched from Pushshift.
+     */
     public BuildAlert(Activity activity, ResultCode resultCode, String intentString, CommentData commentData) {
         this.activity = activity;
         this.resultCode = resultCode;
@@ -62,6 +80,10 @@ public class BuildAlert {
         this.inflater = this.activity.getLayoutInflater();
     }
 
+    /**
+     * Build AlertDialog based on initialized parameters.
+     * @return Return built AlertDialog.
+     */
     public AlertDialog build() {
         AlertDialog.Builder builder;
         switch (this.resultCode) {

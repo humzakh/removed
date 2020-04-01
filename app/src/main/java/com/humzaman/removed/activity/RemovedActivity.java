@@ -18,6 +18,10 @@ import com.humzaman.removed.util.BuildAlert;
 import com.humzaman.removed.util.CheckURL;
 import com.humzaman.removed.util.ResultCode;
 
+/*
+ * RemovedActivity receives an intent, checks whether the intent is a valid reddit link,
+ * then fetches archived comment data from Pushshift.
+*/
 public class RemovedActivity extends AppCompatActivity implements FetchDataCallback {
     private static final String TAG = "RemovedActivity";
 
@@ -32,8 +36,8 @@ public class RemovedActivity extends AppCompatActivity implements FetchDataCallb
         initialize();
     }
 
-    @Override
-    protected void onDestroy() { // handle activity destruction issues (screen rotation)
+    @Override // handle activity destruction issues (e.g. screen rotation)
+    protected void onDestroy() {
         super.onDestroy();
 
         removeProgressDialog();
@@ -49,39 +53,39 @@ public class RemovedActivity extends AppCompatActivity implements FetchDataCallb
         this.viewModel = new ViewModelProvider(this).get(RemovedViewModel.class);
 
         if (viewModel.commentData != null) {
-            Log.i(TAG, "initialize: Already initialized, checked URL, and fetched data.");
+            Log.d(TAG, "initialize: Already initialized, checked URL, and fetched data.");
             buildAndShowAlert(viewModel.resultCode);
         }
         else if (viewModel.resultCode == null) {
-            Log.i(TAG, "initialize: Getting intentString and checking URL.");
+            Log.d(TAG, "initialize: Getting intentString and checking URL.");
             Intent intent = getIntent();
 
             if (intent.hasExtra(Intent.EXTRA_TEXT)) {
                 viewModel.intentString = intent.getStringExtra(Intent.EXTRA_TEXT);
-                Log.i(TAG, "intentString: " + viewModel.intentString);
+                Log.d(TAG, "intentString: " + viewModel.intentString);
 
                 CheckURL checkURL = new CheckURL();
                 viewModel.id = checkURL.check(viewModel.intentString);
                 viewModel.resultCode = checkURL.getResultCode();
 
                 if (viewModel.resultCode == ResultCode.VALID_COMMENT) {
-                    Log.i(TAG, "initialize: intentString is a valid comment. Fetching data.");
+                    Log.d(TAG, "initialize: intentString is a valid comment. Fetching data.");
                     (new FetchData(viewModel.id)).fetch(this);
                     showProgressDialog();
                 }
                 else {
-                    Log.i(TAG, "initialize: resultCode: " + viewModel.resultCode.name());
+                    Log.d(TAG, "initialize: resultCode: " + viewModel.resultCode.name());
                     buildAndShowAlert(viewModel.resultCode);
                 }
             }
         }
         else if (viewModel.resultCode == ResultCode.VALID_COMMENT) {
-            Log.i(TAG, "initialize: Already initialized and checked URL. Fetching data.");
+            Log.d(TAG, "initialize: Already initialized and checked URL. Fetching data.");
             (new FetchData(viewModel.id)).fetch(this);
             showProgressDialog();
         }
         else if (viewModel.intentString != null) {
-            Log.i(TAG, "initialize: Already initialized, checked URL. Showing " +
+            Log.d(TAG, "initialize: Already initialized and checked URL. Showing " +
                     viewModel.resultCode.name() + " alertDialog.");
             buildAndShowAlert(viewModel.resultCode);
         }
@@ -90,25 +94,25 @@ public class RemovedActivity extends AppCompatActivity implements FetchDataCallb
     private void buildAndShowAlert(ResultCode resultCode) {
         switch (resultCode) {
             case VALID_COMMENT: {
-                Log.i(TAG, "buildAndShowAlert: Showing unremoved comment alertDialog.");
+                Log.d(TAG, "buildAndShowAlert: Showing unremoved comment alertDialog.");
                 this.alertDialog = (new BuildAlert(this, resultCode, viewModel.intentString, viewModel.commentData)).build();
                 alertDialog.show();
                 break;
             }
             case SUBMISSION: {
-                Log.i(TAG, "buildAndShowAlert: Showing submission alertDialog.");
+                Log.d(TAG, "buildAndShowAlert: Showing submission alertDialog.");
                 this.alertDialog = (new BuildAlert(this, resultCode, viewModel.intentString)).build();
                 alertDialog.show();
                 break;
             }
             case ERROR_RESPONSE: {
-                Log.i(TAG, "buildAndShowAlert: Showing error alertDialog.");
+                Log.d(TAG, "buildAndShowAlert: Showing error alertDialog.");
                 this.alertDialog = (new BuildAlert(this, resultCode, viewModel.intentString)).build();
                 alertDialog.show();
                 break;
             }
             default: {
-                Log.i(TAG, "buildAndShowAlert: Showing " + resultCode.name() + " alertDialog.");
+                Log.d(TAG, "buildAndShowAlert: Showing " + resultCode.name() + " alertDialog.");
                 this.alertDialog = (new BuildAlert(this, resultCode)).build();
                 alertDialog.show();
                 break;
@@ -117,7 +121,7 @@ public class RemovedActivity extends AppCompatActivity implements FetchDataCallb
     }
 
     private void showProgressDialog() {
-        Log.i(TAG, "showProgressDialog: Showing progressDialog.");
+        Log.d(TAG, "showProgressDialog: Showing progressDialog.");
         if (progressDialog == null) {
             progressDialog = new ProgressDialog(this);
             progressDialog.setCancelable(false);
@@ -133,7 +137,7 @@ public class RemovedActivity extends AppCompatActivity implements FetchDataCallb
     }
 
     private void removeProgressDialog() {
-        Log.i(TAG, "removeProgressDialog: Removing progressDialog.");
+        Log.d(TAG, "removeProgressDialog: Removing progressDialog.");
         if (progressDialog != null) {
             if (progressDialog.isShowing())
                 progressDialog.dismiss();
@@ -143,7 +147,7 @@ public class RemovedActivity extends AppCompatActivity implements FetchDataCallb
 
     @Override // FetchDataCallback
     public void onSuccess(CommentData commentData) {
-        Log.i(TAG, "onSuccess: Retrofit returned commentData.");
+        Log.d(TAG, "onSuccess: Retrofit returned commentData.");
         viewModel.commentData = commentData;
 
         if (progressDialog != null) {

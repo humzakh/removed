@@ -25,10 +25,18 @@ public class FetchData {
     private static final String PUSHSHIFT_BASE = "https://api.pushshift.io";
     private static final String REDDIT_BASE = "https://api.reddit.com";
 
+    /**
+     * Initialize FetchData with the id of the comment to be fetched from Pushshift.
+     * @param id reddit comment id
+     */
     public FetchData(String id) {
         this.id = id;
     }
 
+    /**
+     * Fetch data from Pushshift and reddit (for current score) using Retrofit.
+     * @param callback Callback to calling class when Retrofit finishes its job.
+     */
     public void fetch(FetchDataCallback callback) {
         PushshiftClient pushshiftClient = getPushshiftRetrofitInstance().create(PushshiftClient.class);
         Call<PushshiftDataObject> pushshiftCall = pushshiftClient.getCommentData(id);

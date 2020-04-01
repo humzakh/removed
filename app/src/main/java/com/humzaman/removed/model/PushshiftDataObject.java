@@ -2,6 +2,9 @@ package com.humzaman.removed.model;
 
 import java.util.List;
 
+/*
+ * Pushshift returns an array called data containing comment data.
+ */
 public class PushshiftDataObject {
     private List<CommentData> data;
 
