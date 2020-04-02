@@ -3,7 +3,7 @@
 local.properties
 .idea/caches
 .idea/libraries
-.idea/dictionaries/Humza.xml
+.idea/dictionaries
 .idea/modules.xml
 .idea/workspace.xml
 .idea/navEditor.xml
@@ -13,3 +13,5 @@ build
 captures
 .externalNativeBuild
 .cxx
+Extra Shit/
+app/release/
