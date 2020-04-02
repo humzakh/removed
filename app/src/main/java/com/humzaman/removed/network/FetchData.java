@@ -9,6 +9,7 @@ import com.humzaman.removed.util.ResultCode;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -46,6 +47,7 @@ public class FetchData {
         pushshiftCall.enqueue(new Callback<PushshiftDataObject>() {
             @Override
             public void onResponse(Call<PushshiftDataObject> callP, Response<PushshiftDataObject> responseP) {
+                Log.i(TAG, "onResponse: " + responseP.code());
                 if (responseP.isSuccessful() && responseP.body() != null) {
                     List<CommentData> commentDataList = responseP.body().getData();
 
@@ -103,6 +105,18 @@ public class FetchData {
                             Log.e(TAG, "onResponse: Pushshift 500");
                             callback.onException(ResultCode.PUSHSHIFT_500);
                             break;
+                        case 502:
+                            Log.e(TAG, "onResponse: Pushshift 502");
+                            callback.onException(ResultCode.PUSHSHIFT_502);
+                            break;
+                        case 503:
+                            Log.e(TAG, "onResponse: Pushshift 503");
+                            callback.onException(ResultCode.PUSHSHIFT_503);
+                            break;
+                        case 504:
+                            Log.e(TAG, "onResponse: Pushshift 504");
+                            callback.onException(ResultCode.PUSHSHIFT_504);
+                            break;
                         default:
                             Log.e(TAG, "onResponse: Pushshift unknown error.");
                             callback.onException(ResultCode.ERROR_RESPONSE);
@@ -114,8 +128,14 @@ public class FetchData {
             @Override
             public void onFailure(Call<PushshiftDataObject> call, Throwable t) {
                 if (t instanceof IOException) {
-                    Log.e(TAG, "No internet connection.");
-                    callback.onException(ResultCode.NO_INTERNET);
+                    if (Objects.equals(t.getMessage(), "timeout")) {
+                        Log.e(TAG, "onFailure: Pushshift timeout", t);
+                        callback.onException(ResultCode.TIMEOUT);
+                    }
+                    else {
+                        Log.e(TAG, "onFailure: No internet connection.", t);
+                        callback.onException(ResultCode.NO_INTERNET);
+                    }
                 }
                 else {
                     Log.e(TAG, "onFailure: ", t);

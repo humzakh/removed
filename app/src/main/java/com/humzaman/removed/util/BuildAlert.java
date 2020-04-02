@@ -338,17 +338,53 @@ public class BuildAlert {
             case NO_DATA_FOUND: // no data found on Pushshift
                 builder.setMessage(R.string.not_archived);
                 break;
+            case TIMEOUT:
+                builder.setMessage("Error: connection timed out.\n\nPushshift is taking too long to respond.\nTheir servers may be having some issues.\n\nCheck pushshift.io for updates, or try again later.")
+                       .setNeutralButton("Pushshift.io", (dialog, i) -> {
+                           Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://pushshift.io"));
+                           activity.startActivity(browserIntent);
+                           dialog.dismiss();
+                           activity.finish();
+                       });
+                break;
             case PUSHSHIFT_404:
                 builder.setMessage("Error 404: not found.");
                 break;
             case PUSHSHIFT_500:
-                builder.setMessage("Error 500: Pushshift's servers are down.\n\nCheck pushshift.io for updates, or try again later.")
+                builder.setMessage("Error 500: Pushshift's servers seem to be having some issues.\n\nCheck pushshift.io for updates, or try again later.")
                         .setNeutralButton("Pushshift.io", (dialog, i) -> {
                             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://pushshift.io"));
                             activity.startActivity(browserIntent);
                             dialog.dismiss();
                             activity.finish();
                         });
+                break;
+            case PUSHSHIFT_502:
+                builder.setMessage("Error 502:\nPushshift's servers seem to be having some issues.\n\nCheck pushshift.io for updates, or try again later.")
+                       .setNeutralButton("Pushshift.io", (dialog, i) -> {
+                           Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://pushshift.io"));
+                           activity.startActivity(browserIntent);
+                           dialog.dismiss();
+                           activity.finish();
+                       });
+                break;
+            case PUSHSHIFT_503:
+                builder.setMessage("Error 503: Pushshift's servers seem to be having some issues.\n\nCheck pushshift.io for updates, or try again later.")
+                       .setNeutralButton("Pushshift.io", (dialog, i) -> {
+                           Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://pushshift.io"));
+                           activity.startActivity(browserIntent);
+                           dialog.dismiss();
+                           activity.finish();
+                       });
+                break;
+            case PUSHSHIFT_504:
+                builder.setMessage("Error 504: Pushshift's servers seem to be having some issues.\n\nCheck pushshift.io for updates, or try again later.")
+                       .setNeutralButton("Pushshift.io", (dialog, i) -> {
+                           Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://pushshift.io"));
+                           activity.startActivity(browserIntent);
+                           dialog.dismiss();
+                           activity.finish();
+                       });
                 break;
             case ERROR_RESPONSE: // Pushshift error response
                 String[] address = {activity.getString(R.string.dev_email)};
