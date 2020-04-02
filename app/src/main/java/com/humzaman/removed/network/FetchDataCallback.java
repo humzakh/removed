@@ -6,4 +6,5 @@ import com.humzaman.removed.util.ResultCode;
 public interface FetchDataCallback {
     void onSuccess(CommentData commentData);
     void onException(ResultCode resultCode);
+    void onException(ResultCode resultCode, Throwable throwable);
 }

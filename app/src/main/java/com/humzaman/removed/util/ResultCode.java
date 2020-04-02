@@ -16,6 +16,7 @@ public enum ResultCode {
     PUSHSHIFT_502,
     PUSHSHIFT_503,
     PUSHSHIFT_504,
-    ERROR_RESPONSE,
+    PUSHSHIFT_OTHER,
+    UNKNOWN_ERROR,
     TIMEOUT
 }

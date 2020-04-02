@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.text.Spanned;
 import android.text.format.DateUtils;
 import android.text.method.LinkMovementMethod;
@@ -22,11 +23,14 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.text.HtmlCompat;
 import androidx.core.view.MenuCompat;
 
+import com.humzaman.removed.BuildConfig;
 import com.humzaman.removed.R;
 import com.humzaman.removed.model.CommentData;
 
 import org.commonmark.node.Node;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
@@ -40,6 +44,7 @@ public class BuildAlert {
     private ResultCode resultCode;
     private String intentString;
     private CommentData commentData;
+    private Throwable throwable;
 
     /**
      * Initialize BuildAlert for generic alert dialog.
@@ -53,7 +58,7 @@ public class BuildAlert {
     }
 
     /**
-     * Initialize BuildAlert for submission dialog or error dialog. (email intentString to dev).
+     * Initialize BuildAlert for submission dialog.
      * @param activity Context to be passed to AlertDialog.Builder
      * @param resultCode Determines which dialog to display.
      * @param intentString Used either for removeddit link (submission) or debugging (error).
@@ -81,32 +86,50 @@ public class BuildAlert {
     }
 
     /**
+     * Initialize BuildAlert for error dialog (email info to dev).
+     * @param activity Context to be passed to AlertDialog.Builder
+     * @param intentString Intent string to be emailed to dev for debugging.
+     * @param throwable Stack trace to be emailed to dev for debugging.
+     */
+    public BuildAlert(Activity activity, String intentString, Throwable throwable) {
+        this.activity = activity;
+        this.intentString = intentString;
+        this.throwable = throwable;
+        this.inflater = this.activity.getLayoutInflater();
+    }
+
+    /**
      * Build AlertDialog based on initialized parameters.
      * @return Return built AlertDialog.
      */
     public AlertDialog build() {
         AlertDialog.Builder builder;
-        switch (this.resultCode) {
-            case VALID_COMMENT: {
-                builder = buildValidComment();
-                break;
+        if (this.throwable == null) {
+            switch (this.resultCode) {
+                case VALID_COMMENT: {
+                    builder = buildValidComment();
+                    break;
+                }
+                case SUBMISSION: {
+                    builder = buildSubmission();
+                    break;
+                }
+                case MORE_DETAILS: {
+                    builder = buildMoreDetails();
+                    break;
+                }
+                case ABOUT: {
+                    builder = buildAbout();
+                    break;
+                }
+                default: { // Error codes
+                    builder = buildGeneric();
+                    break;
+                }
             }
-            case SUBMISSION: {
-                builder = buildSubmission();
-                break;
-            }
-            case MORE_DETAILS: {
-                builder = buildMoreDetails();
-                break;
-            }
-            case ABOUT: {
-                builder = buildAbout();
-                break;
-            }
-            default: { // Error codes
-                builder = buildGeneric();
-                break;
-            }
+        }
+        else {
+            builder = buildError();
         }
 
         AlertDialog alert = builder.create();
@@ -351,7 +374,7 @@ public class BuildAlert {
                 builder.setMessage("Error 404: not found.");
                 break;
             case PUSHSHIFT_500:
-                builder.setMessage("Error 500: Pushshift's servers seem to be having some issues.\n\nCheck pushshift.io for updates, or try again later.")
+                builder.setMessage("Error 500: internal server error.\n\nPushshift's servers seem to be having some issues.\n\nCheck pushshift.io for updates, or try again later.")
                         .setNeutralButton("Pushshift.io", (dialog, i) -> {
                             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://pushshift.io"));
                             activity.startActivity(browserIntent);
@@ -360,7 +383,7 @@ public class BuildAlert {
                         });
                 break;
             case PUSHSHIFT_502:
-                builder.setMessage("Error 502:\nPushshift's servers seem to be having some issues.\n\nCheck pushshift.io for updates, or try again later.")
+                builder.setMessage("Error 502: bad gateway.\n\nPushshift's servers seem to be having some issues.\n\nCheck pushshift.io for updates, or try again later.")
                        .setNeutralButton("Pushshift.io", (dialog, i) -> {
                            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://pushshift.io"));
                            activity.startActivity(browserIntent);
@@ -369,7 +392,7 @@ public class BuildAlert {
                        });
                 break;
             case PUSHSHIFT_503:
-                builder.setMessage("Error 503: Pushshift's servers seem to be having some issues.\n\nCheck pushshift.io for updates, or try again later.")
+                builder.setMessage("Error 503: service unavailable.\n\nPushshift's servers seem to be having some issues.\n\nCheck pushshift.io for updates, or try again later.")
                        .setNeutralButton("Pushshift.io", (dialog, i) -> {
                            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://pushshift.io"));
                            activity.startActivity(browserIntent);
@@ -378,7 +401,7 @@ public class BuildAlert {
                        });
                 break;
             case PUSHSHIFT_504:
-                builder.setMessage("Error 504: Pushshift's servers seem to be having some issues.\n\nCheck pushshift.io for updates, or try again later.")
+                builder.setMessage("Error 504: gateway timeout.\n\nPushshift's servers seem to be having some issues.\n\nCheck pushshift.io for updates, or try again later.")
                        .setNeutralButton("Pushshift.io", (dialog, i) -> {
                            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://pushshift.io"));
                            activity.startActivity(browserIntent);
@@ -386,20 +409,14 @@ public class BuildAlert {
                            activity.finish();
                        });
                 break;
-            case ERROR_RESPONSE: // Pushshift error response
-                String[] address = {activity.getString(R.string.dev_email)};
-
-                builder.setMessage("Unknown Error: Please contact the developer.")
-                        .setNeutralButton("Email", (dialog, i) -> {
-                            Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
-                            emailIntent.setData(Uri.parse("mailto:"));
-                            emailIntent.putExtra(Intent.EXTRA_EMAIL, address);
-                            emailIntent.putExtra(Intent.EXTRA_SUBJECT, "[removed] error report");
-                            emailIntent.putExtra(Intent.EXTRA_TEXT, "Intent string: " + intentString);
-                            activity.startActivity(emailIntent);
-                            dialog.dismiss();
-                            activity.finish();
-                        });
+            case PUSHSHIFT_OTHER:
+                builder.setMessage("Error: unknown server error.\n\nPushshift's servers may be having some issues.\n\nCheck pushshift.io for updates, or try again later.")
+                       .setNeutralButton("Pushshift.io", (dialog, i) -> {
+                           Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://pushshift.io"));
+                           activity.startActivity(browserIntent);
+                           dialog.dismiss();
+                           activity.finish();
+                       });
                 break;
             default: // invalid link
                 builder.setMessage("Error: invalid link.");
@@ -407,5 +424,49 @@ public class BuildAlert {
         }
 
         return builder;
+    }
+
+    @SuppressLint("InflateParams")
+    private AlertDialog.Builder buildError() {
+        View dialogToolbar = inflater.inflate(R.layout.alert_toolbar, null);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder.setCustomTitle(dialogToolbar)
+               .setMessage("Unknown Error: Please contact the developer.")
+               .setPositiveButton("OK", (dialog, id) -> {
+                   dialog.dismiss();
+                   activity.finish();
+               })
+               .setNeutralButton("Email", (dialog, i) -> {
+                   Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
+                   emailIntent.setData(Uri.parse("mailto:"));
+                   emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{activity.getString(R.string.dev_email)});
+                   emailIntent.putExtra(Intent.EXTRA_SUBJECT, "[removed] error report");
+                   emailIntent.putExtra(Intent.EXTRA_TEXT, getErrorString());
+                   activity.startActivity(emailIntent);
+                   dialog.dismiss();
+                   activity.finish();
+               })
+               .setOnCancelListener(dialog -> {
+                   dialog.dismiss();
+                   activity.finish();
+               });
+
+        return builder;
+    }
+
+    private String getErrorString() {
+        StringWriter sw = new StringWriter();
+        throwable.printStackTrace(new PrintWriter(sw));
+        String build = "APP VERSION: " + BuildConfig.VERSION_NAME + "(" + BuildConfig.VERSION_CODE + ")" +
+                       "\nSDK VERSION: " + Build.VERSION.SDK_INT +
+                       "\nMANUFACTURER: " + Build.MANUFACTURER +
+                       "\nMODEL: " + Build.MODEL;
+
+        return "Please describe the problem: \n\n" +
+               "--WRITE ABOVE THIS LINE--\n" +
+               build + "\n\n" +
+               "INTENT STRING: " + intentString +
+               "\n\nSTACK TRACE:\n" + sw.toString();
     }
 }

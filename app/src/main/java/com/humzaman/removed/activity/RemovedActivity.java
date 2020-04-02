@@ -52,40 +52,44 @@ public class RemovedActivity extends AppCompatActivity implements FetchDataCallb
     private void initialize() {
         this.viewModel = new ViewModelProvider(this).get(RemovedViewModel.class);
 
-        if (viewModel.commentData != null) {
-            Log.d(TAG, "initialize: Already initialized, checked URL, and fetched data.");
+        if (viewModel.throwable != null) {
+            Log.i(TAG, "initialize: Already initialized, unknown error in FetchData.");
+            buildAndShowError(viewModel.throwable);
+        }
+        else if (viewModel.commentData != null) {
+            Log.i(TAG, "initialize: Already initialized, checked URL, and fetched data.");
             buildAndShowAlert(viewModel.resultCode);
         }
         else if (viewModel.resultCode == null) {
-            Log.d(TAG, "initialize: Getting intentString and checking URL.");
+            Log.i(TAG, "initialize: Getting intentString and checking URL.");
             Intent intent = getIntent();
 
             if (intent.hasExtra(Intent.EXTRA_TEXT)) {
                 viewModel.intentString = intent.getStringExtra(Intent.EXTRA_TEXT);
-                Log.d(TAG, "intentString: " + viewModel.intentString);
+                Log.i(TAG, "intentString: " + viewModel.intentString);
 
                 CheckURL checkURL = new CheckURL();
                 viewModel.id = checkURL.check(viewModel.intentString);
                 viewModel.resultCode = checkURL.getResultCode();
 
                 if (viewModel.resultCode == ResultCode.VALID_COMMENT) {
-                    Log.d(TAG, "initialize: intentString is a valid comment. Fetching data.");
+                    Log.i(TAG, "initialize: intentString is a valid comment. Fetching data.");
                     (new FetchData(viewModel.id)).fetch(this);
                     showProgressDialog();
                 }
                 else {
-                    Log.d(TAG, "initialize: resultCode: " + viewModel.resultCode.name());
+                    Log.i(TAG, "initialize: resultCode: " + viewModel.resultCode.name());
                     buildAndShowAlert(viewModel.resultCode);
                 }
             }
         }
         else if (viewModel.resultCode == ResultCode.VALID_COMMENT) {
-            Log.d(TAG, "initialize: Already initialized and checked URL. Fetching data.");
+            Log.i(TAG, "initialize: Already initialized and checked URL. Fetching data.");
             (new FetchData(viewModel.id)).fetch(this);
             showProgressDialog();
         }
         else if (viewModel.intentString != null) {
-            Log.d(TAG, "initialize: Already initialized and checked URL. Showing " +
+            Log.i(TAG, "initialize: Already initialized and checked URL. Showing " +
                     viewModel.resultCode.name() + " alertDialog.");
             buildAndShowAlert(viewModel.resultCode);
         }
@@ -94,34 +98,39 @@ public class RemovedActivity extends AppCompatActivity implements FetchDataCallb
     private void buildAndShowAlert(ResultCode resultCode) {
         switch (resultCode) {
             case VALID_COMMENT: {
-                Log.d(TAG, "buildAndShowAlert: Showing unremoved comment alertDialog.");
+                Log.i(TAG, "buildAndShowAlert: Showing unremoved comment alertDialog.");
                 this.alertDialog = (new BuildAlert(this, resultCode, viewModel.intentString, viewModel.commentData)).build();
-                alertDialog.show();
                 break;
             }
             case SUBMISSION: {
-                Log.d(TAG, "buildAndShowAlert: Showing submission alertDialog.");
+                Log.i(TAG, "buildAndShowAlert: Showing submission alertDialog.");
                 this.alertDialog = (new BuildAlert(this, resultCode, viewModel.intentString)).build();
-                alertDialog.show();
                 break;
             }
-            case ERROR_RESPONSE: {
-                Log.d(TAG, "buildAndShowAlert: Showing error alertDialog.");
+            case UNKNOWN_ERROR: {
+                Log.i(TAG, "buildAndShowAlert: Showing error alertDialog.");
                 this.alertDialog = (new BuildAlert(this, resultCode, viewModel.intentString)).build();
-                alertDialog.show();
                 break;
             }
             default: {
-                Log.d(TAG, "buildAndShowAlert: Showing " + resultCode.name() + " alertDialog.");
+                Log.i(TAG, "buildAndShowAlert: Showing " + resultCode.name() + " alertDialog.");
                 this.alertDialog = (new BuildAlert(this, resultCode)).build();
-                alertDialog.show();
                 break;
             }
         }
+        removeProgressDialog();
+        alertDialog.show();
+    }
+    
+    private void buildAndShowError(Throwable throwable) {
+        Log.i(TAG, "buildAndShowError: Showing UNKNOWN_ERROR alertDialog.");
+        this.alertDialog = (new BuildAlert(this, viewModel.intentString, throwable)).build();
+        removeProgressDialog();
+        alertDialog.show();
     }
 
     private void showProgressDialog() {
-        Log.d(TAG, "showProgressDialog: Showing progressDialog.");
+        Log.i(TAG, "showProgressDialog: Showing progressDialog.");
         if (progressDialog == null) {
             progressDialog = new ProgressDialog(this);
             progressDialog.setCancelable(false);
@@ -137,7 +146,7 @@ public class RemovedActivity extends AppCompatActivity implements FetchDataCallb
     }
 
     private void removeProgressDialog() {
-        Log.d(TAG, "removeProgressDialog: Removing progressDialog.");
+        Log.i(TAG, "removeProgressDialog: Removing progressDialog.");
         if (progressDialog != null) {
             if (progressDialog.isShowing())
                 progressDialog.dismiss();
@@ -147,23 +156,32 @@ public class RemovedActivity extends AppCompatActivity implements FetchDataCallb
 
     @Override // FetchDataCallback
     public void onSuccess(CommentData commentData) {
-        Log.d(TAG, "onSuccess: Retrofit returned commentData.");
+        Log.i(TAG, "onSuccess: Retrofit returned commentData.");
         viewModel.commentData = commentData;
 
         if (progressDialog != null) {
-            removeProgressDialog();
             buildAndShowAlert(viewModel.resultCode);
         }
     }
 
     @Override // FetchDataCallback
     public void onException(ResultCode resultCode) {
-        Log.e(TAG, "onException: Retrofit threw exception.");
+        Log.e(TAG, "onException: Retrofit threw exception and returned resultCode: " + resultCode.name());
         viewModel.resultCode = resultCode;
 
         if (progressDialog != null) {
-            removeProgressDialog();
             buildAndShowAlert(resultCode);
+        }
+    }
+
+    @Override // FetchDataCallback
+    public void onException(ResultCode resultCode, Throwable throwable) {
+        Log.e(TAG, "onException: Retrofit threw exception", throwable);
+        viewModel.resultCode = resultCode;
+        viewModel.throwable = throwable;
+
+        if (progressDialog != null) {
+            buildAndShowError(throwable);
         }
     }
 }

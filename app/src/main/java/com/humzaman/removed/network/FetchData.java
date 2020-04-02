@@ -28,7 +28,7 @@ public class FetchData {
 
     /**
      * Initialize FetchData with the id of the comment to be fetched from Pushshift.
-     * @param id reddit comment id
+     * @param id reddit comment id (do not include t1_ prefix)
      */
     public FetchData(String id) {
         this.id = id;
@@ -47,99 +47,88 @@ public class FetchData {
         pushshiftCall.enqueue(new Callback<PushshiftDataObject>() {
             @Override
             public void onResponse(Call<PushshiftDataObject> callP, Response<PushshiftDataObject> responseP) {
-                Log.i(TAG, "onResponse: " + responseP.code());
                 if (responseP.isSuccessful() && responseP.body() != null) {
                     List<CommentData> commentDataList = responseP.body().getData();
 
                     if (commentDataList.size() > 0) {
+                        Log.i(TAG, "onResponse: Pushshift " + responseP.code());
                         commentData = commentDataList.get(0);
                         commentData.setPermalink("https://reddit.com" + commentData.getPermalink());
 
                         RedditClient redditClient = getRedditRetrofitInstance().create(RedditClient.class);
                         Call<JsonObject> redditCall = redditClient.getScore("t1_" + id);
 
+                        // get current score from reddit
                         //noinspection NullableProblems
                         redditCall.enqueue(new Callback<JsonObject>() {
                             @Override
                             public void onResponse(Call<JsonObject> callR, Response<JsonObject> responseR) {
                                 if (responseR.isSuccessful() && responseR.body() != null) {
+                                    Log.i(TAG, "onResponse: reddit " + responseR.code());
                                     JsonObject redditObject = responseR.body().getAsJsonObject("data").getAsJsonArray("children").get(0).getAsJsonObject().getAsJsonObject("data");
                                     String score = redditObject.get("score").getAsString();
+                                    Log.i(TAG, "onResponse: reddit score: " + score);
                                     commentData.setScore(score);
                                 }
                                 else {
-                                    switch (responseR.code()) {
-                                        case 404:
-                                            Log.e(TAG, "onResponse: reddit 404");
-                                            break;
-                                        case 500:
-                                            Log.e(TAG, "onResponse: reddit 500");
-                                            break;
-                                        default:
-                                            Log.e(TAG, "onResponse: reddit unknown error.");
-                                            break;
-                                    }
+                                    Log.e(TAG, "onResponse: reddit " + responseR.code());
                                 }
                                 callback.onSuccess(commentData);
                             }
 
-                            public void onFailure(Call<JsonObject> callR, Throwable t) {
-                                Log.e(TAG, "onFailure: ", t);
+                            // even if redditCall fails or returns null,
+                            // we'll show the archived score from Pushshift, so we call onSuccess.
+                            public void onFailure(Call<JsonObject> callR, Throwable throwable) {
+                                Log.e(TAG, "onFailure: ", throwable);
                                 callback.onSuccess(commentData);
                             }
 
                         });
                     }
-                    else { // no archived data found
+                    else { // comment not archived by Pushshift
                         Log.e(TAG, "onResponse: [no archived data found]");
                         callback.onException(ResultCode.NO_DATA_FOUND);
                     }
                 }
-                else {
+                else { // Pushshift server error codes
+                    Log.e(TAG, "onResponse: Pushshift " + responseP.code());
                     switch (responseP.code()) {
                         case 404:
-                            Log.e(TAG, "onResponse: Pushshift 404");
                             callback.onException(ResultCode.PUSHSHIFT_404);
                             break;
                         case 500:
-                            Log.e(TAG, "onResponse: Pushshift 500");
                             callback.onException(ResultCode.PUSHSHIFT_500);
                             break;
                         case 502:
-                            Log.e(TAG, "onResponse: Pushshift 502");
                             callback.onException(ResultCode.PUSHSHIFT_502);
                             break;
                         case 503:
-                            Log.e(TAG, "onResponse: Pushshift 503");
                             callback.onException(ResultCode.PUSHSHIFT_503);
                             break;
                         case 504:
-                            Log.e(TAG, "onResponse: Pushshift 504");
                             callback.onException(ResultCode.PUSHSHIFT_504);
                             break;
                         default:
-                            Log.e(TAG, "onResponse: Pushshift unknown error.");
-                            callback.onException(ResultCode.ERROR_RESPONSE);
+                            callback.onException(ResultCode.PUSHSHIFT_OTHER);
                             break;
                     }
                 }
             }
 
             @Override
-            public void onFailure(Call<PushshiftDataObject> call, Throwable t) {
-                if (t instanceof IOException) {
-                    if (Objects.equals(t.getMessage(), "timeout")) {
-                        Log.e(TAG, "onFailure: Pushshift timeout", t);
+            public void onFailure(Call<PushshiftDataObject> call, Throwable throwable) {
+                if (throwable instanceof IOException) {
+                    if (Objects.equals(throwable.getMessage(), "timeout")) {
+                        Log.e(TAG, "onFailure: Pushshift timeout", throwable);
                         callback.onException(ResultCode.TIMEOUT);
                     }
                     else {
-                        Log.e(TAG, "onFailure: No internet connection.", t);
+                        Log.e(TAG, "onFailure: No internet connection.", throwable);
                         callback.onException(ResultCode.NO_INTERNET);
                     }
                 }
                 else {
-                    Log.e(TAG, "onFailure: ", t);
-                    callback.onException(ResultCode.ERROR_RESPONSE);
+                    callback.onException(ResultCode.UNKNOWN_ERROR, throwable);
                 }
             }
         });

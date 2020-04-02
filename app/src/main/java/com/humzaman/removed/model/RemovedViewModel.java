@@ -9,4 +9,5 @@ public class RemovedViewModel extends ViewModel {
     public CommentData commentData;
     public String intentString;
     public String id;
+    public Throwable throwable;
 }
