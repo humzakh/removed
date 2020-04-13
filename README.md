@@ -1,5 +1,5 @@
 # [removed] <img src="https://user-images.githubusercontent.com/13255511/74567142-b74a0380-4f3a-11ea-990b-c7d30f3fa078.png" width="90px" align="left">
-#### An Android app for quickly viewing [removed] and [deleted] reddit comments.
+__An Android app for quickly viewing [removed] and [deleted] reddit comments.__
 
 <a target="_blank" href='https://play.google.com/store/apps/details?id=com.humzaman.removed'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png' width="300px"/></a>
 
