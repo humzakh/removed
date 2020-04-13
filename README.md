@@ -4,15 +4,15 @@ An Android app for quickly viewing [removed] and [deleted] reddit comments.
 <a target="_blank" href='https://play.google.com/store/apps/details?id=com.humzaman.removed'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png' width="300px"/></a>
 
 Special thanks to: 
-* Jason Baumgartner for creating and maintaining pushshift.io, the ultimate reddit archive tool.
-* Jesper Wrang for creating removeddit.com, a web app for viewing removed comments and posts.
+* Jason Baumgartner for creating and maintaining <a href="https://pushshift.io">pushshift.io</a>, the ultimate reddit archive tool.
+* Jesper Wrang for creating <a href="https://removeddit.com">removeddit.com</a>, a web app for viewing removed comments and posts.
 
 ----
 When I'm browsing through reddit, I tend to come across [removed] and [deleted] comments pretty frequently. Sometimes those comments are removed for saying something controversial, earning a ton of downvotes and disapproving responses. Other times, a comment is removed by the /r/AskHistorians mods for not meeting subreddit guidelines.
 
 Regardless of the reason, my curiosity demands seeing what that comment originally said. Like many others, I'd copy the comment URL, paste it in my phone's browser, replace "reddit.com" with "removeddit.com", _and only then_ be able to read the unremoved comment. But that quickly became incredibly tedious to do every single time.
 
-So, I figured I'd make an app that directly retrieves archived data from pushshift.io, the source websites like removeddit and ceddit get their data from.
+So, I figured I'd make an app that directly retrieves archived data from <a href="https://pushshift.io">pushshift.io</a>, the source websites like removeddit and ceddit get their data from.
 
 Introducing "[removed]" an app that quickly displays a dialog with a removed comment's data.
 
