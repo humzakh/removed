@@ -8,7 +8,7 @@ Special thanks to:
 * Jesper Wrang for creating <a href="https://removeddit.com">removeddit.com</a>, a web app for viewing removed comments and posts.
 
 ----
-When I'm browsing through reddit, I tend to come across [removed] and [deleted] comments pretty frequently. Sometimes those comments are removed for saying something controversial, earning a ton of downvotes and disapproving responses. Other times, a comment is removed by the /r/AskHistorians mods for not meeting subreddit guidelines.
+When I'm browsing through reddit, I tend to come across [removed] and [deleted] comments pretty frequently. Sometimes those comments are removed for saying something controversial, earning a ton of downvotes and disapproving responses. Other times, a comment is removed by the <a href="https://reddit.com/r/AskHistorians">/r/AskHistorians</a> moderators for not meeting subreddit guidelines.
 
 Regardless of the reason, my curiosity demands seeing what that comment originally said. Like many others, I'd copy the comment URL, paste it in my phone's browser, replace "reddit.com" with "removeddit.com", _and only then_ be able to read the unremoved comment. But that quickly became incredibly tedious to do every single time.
 
@@ -16,13 +16,13 @@ So, I figured I'd make an app that directly retrieves archived data from <a href
 
 Introducing "[removed]" an app that quickly displays a dialog with a removed comment's data.
 
-Unremoving a comment now only takes a few simple steps:
+__Unremoving a comment now only takes a few simple steps:__
 
 <table style="width:100%">
   <tr>
     <th>1. Share the comment</th>
     <th>2. Tap on [removed]</th> 
-    <th>3. Enjoy your unremoved comment!</th>
+    <th>3. Comment unremoved!</th>
   </tr>
   <tr>
     <td><img src="https://user-images.githubusercontent.com/13255511/74518321-3b6b9f00-4ed9-11ea-8cdc-baa133e7a78b.jpg" width="300px"/></td>
