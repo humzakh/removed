@@ -17,7 +17,7 @@ So, I figured I'd make an app that directly retrieves archived data from <a href
 
 Introducing "[removed]", an app that quickly displays a dialog with a removed comment's data.
 
-__Unremoving a comment now only takes a few simple steps:__
+#### Unremove a comment with a few simple steps:
 
 <table style="width:100%">
     <tr>
