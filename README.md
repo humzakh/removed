@@ -4,8 +4,8 @@ __An Android app for quickly viewing [removed] and [deleted] reddit comments.__
 <a target="_blank" href='https://play.google.com/store/apps/details?id=com.humzaman.removed'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png' width="300px"/></a>
 
 Special thanks to: 
-* Jason Baumgartner for creating and maintaining <a href="https://pushshift.io">pushshift.io</a>, the ultimate reddit archive tool.
-* Jesper Wrang for creating <a href="https://removeddit.com">removeddit.com</a>, a web app for viewing removed comments and posts.
+* __Jason Baumgartner__ for creating and maintaining <a href="https://pushshift.io">pushshift.io</a>, the ultimate reddit archive tool.
+* __Jesper Wrang__ for creating <a href="https://removeddit.com">removeddit.com</a>, a web app for viewing removed comments and posts.
 
 ----
 
