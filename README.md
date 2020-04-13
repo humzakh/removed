@@ -14,7 +14,7 @@ Regardless of the reason, my curiosity demands seeing what that comment original
 
 So, I figured I'd make an app that directly retrieves archived data from <a href="https://pushshift.io">pushshift.io</a>, the source websites like removeddit and ceddit get their data from.
 
-Introducing "[removed]" an app that quickly displays a dialog with a removed comment's data.
+Introducing "[removed]", an app that quickly displays a dialog with a removed comment's data.
 
 __Unremoving a comment now only takes a few simple steps:__
 
