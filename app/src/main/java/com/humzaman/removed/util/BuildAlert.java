@@ -33,6 +33,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Objects;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
 
@@ -237,14 +238,11 @@ public class BuildAlert {
             markwon.setParsedMarkdown(bodyTV, markdown);
 
             // linkify subreddits and usernames
-            Pattern patternR = Pattern.compile("/?\\b(?=\\w)[rR]/(\\w+)");
-            String schemeR = "https://reddit.com/r/";
-            Pattern patternU = Pattern.compile("/?\\b(?=\\w)[uU]/(\\w+)");
-            String schemeU = "https://reddit.com/u/";
-            Linkify.TransformFilter transformFilter = (match, url) -> match.group(1);
+            Pattern pattern = Pattern.compile("(?<=^|\\s)/?\\b(?=\\w)([rRuU]/(?:\\r\\n|\\r|\\n)?\\S+)");
+            String scheme = "https://reddit.com/";
+            Linkify.TransformFilter transformFilter = (match, url) -> Objects.requireNonNull(match.group(1)).toLowerCase();
 
-            Linkify.addLinks(bodyTV, patternR, schemeR, null, transformFilter);
-            Linkify.addLinks(bodyTV, patternU, schemeU, null, transformFilter);
+            Linkify.addLinks(bodyTV, pattern, scheme, null, transformFilter);
         }
 
         return builder;
