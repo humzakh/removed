@@ -34,8 +34,10 @@ import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
+import java.util.regex.Pattern;
 
 import io.noties.markwon.Markwon;
+import io.noties.markwon.ext.strikethrough.StrikethroughPlugin;
 import io.noties.markwon.linkify.LinkifyPlugin;
 
 public class BuildAlert {
@@ -223,13 +225,26 @@ public class BuildAlert {
 
             // reddit comments use markdown format.
             // obtain an instance of Markwon
-            final Markwon markwon = Markwon.builder(activity).usePlugin(LinkifyPlugin.create(Linkify.WEB_URLS)).build();
+            final Markwon markwon = Markwon.builder(activity)
+                                           .usePlugin(LinkifyPlugin.create(Linkify.WEB_URLS))
+                                           .usePlugin(StrikethroughPlugin.create())
+                                           .build();
             // parse markdown to commonmark-java Node
             final Node node = markwon.parse(commentData.getBody());
             // create styled text from parsed Node
             final Spanned markdown = markwon.render(node);
             // use it on a TextView
             markwon.setParsedMarkdown(bodyTV, markdown);
+
+            // linkify subreddits and usernames
+            Pattern patternR = Pattern.compile("/?\\b(?=\\w)[rR]/(\\w+)");
+            String schemeR = "https://reddit.com/r/";
+            Pattern patternU = Pattern.compile("/?\\b(?=\\w)[uU]/(\\w+)");
+            String schemeU = "https://reddit.com/u/";
+            Linkify.TransformFilter transformFilter = (match, url) -> match.group(1);
+
+            Linkify.addLinks(bodyTV, patternR, schemeR, null, transformFilter);
+            Linkify.addLinks(bodyTV, patternU, schemeU, null, transformFilter);
         }
 
         return builder;
