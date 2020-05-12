@@ -65,10 +65,14 @@ public class FetchData {
                             public void onResponse(Call<JsonObject> callR, Response<JsonObject> responseR) {
                                 if (responseR.isSuccessful() && responseR.body() != null) {
                                     Log.i(TAG, "onResponse: reddit " + responseR.code());
-                                    JsonObject redditObject = responseR.body().getAsJsonObject("data").getAsJsonArray("children").get(0).getAsJsonObject().getAsJsonObject("data");
-                                    String score = redditObject.get("score").getAsString();
-                                    Log.i(TAG, "onResponse: reddit score: " + score);
-                                    commentData.setScore(score);
+                                    try {
+                                        JsonObject redditObject = responseR.body().getAsJsonObject("data").getAsJsonArray("children").get(0).getAsJsonObject().getAsJsonObject("data");
+                                        String score = redditObject.get("score").getAsString();
+                                        Log.i(TAG, "onResponse: reddit score: " + score);
+                                        commentData.setScore(score);
+                                    } catch (Exception e) {
+                                        Log.e(TAG, "onResponse: ", e);
+                                    }
                                 }
                                 else {
                                     Log.e(TAG, "onResponse: reddit " + responseR.code());

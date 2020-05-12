@@ -240,7 +240,9 @@ public class BuildAlert {
             // linkify subreddits and usernames
             Pattern pattern = Pattern.compile("(?<=^|\\s)/?\\b(?=\\w)([rRuU]/(?:\\r\\n|\\r|\\n)?\\S+)");
             String scheme = "https://reddit.com/";
-            Linkify.TransformFilter transformFilter = (match, url) -> Objects.requireNonNull(match.group(1)).toLowerCase();
+            Linkify.TransformFilter transformFilter = (match, url) ->
+                    Objects.requireNonNull(match.group(1)).substring(0, 1).toLowerCase() +
+                    Objects.requireNonNull(match.group(1)).substring(1); // make U or R lowercase
 
             Linkify.addLinks(bodyTV, pattern, scheme, null, transformFilter);
         }
