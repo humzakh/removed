@@ -64,7 +64,7 @@ public class BuildAlert {
      * Initialize BuildAlert for submission dialog.
      * @param activity Context to be passed to AlertDialog.Builder
      * @param resultCode Determines which dialog to display.
-     * @param intentString Used either for removeddit link (submission) or debugging (error).
+     * @param intentString Used either for unddit link (submission) or debugging (error).
      */
     public BuildAlert(Activity activity, ResultCode resultCode, String intentString) {
         this.activity = activity;
@@ -77,7 +77,7 @@ public class BuildAlert {
      * Initialize BuildAlert for valid comment dialog or more details dialog.
      * @param activity Context to be passed to AlertDialog.Builder
      * @param resultCode Determines which dialog to display.
-     * @param intentString Used for removeddit link.
+     * @param intentString Used for unddit link.
      * @param commentData Data fetched from Pushshift.
      */
     public BuildAlert(Activity activity, ResultCode resultCode, String intentString, CommentData commentData) {
@@ -167,10 +167,10 @@ public class BuildAlert {
                     activity.finish();
                 });
 
-        String removeddit = intentString;
-        if (removeddit.contains("old.reddit.com"))
-            removeddit = removeddit.replaceFirst("old[.]", "");
-        final String finalRemoveddit = removeddit.replaceFirst("reddit", "removeddit");
+        String unddit = intentString;
+        if (unddit.contains("old.reddit.com"))
+            unddit = unddit.replaceFirst("old[.]", "");
+        final String finalunddit = unddit.replaceFirst("reddit", "unddit");
 
         toolbar.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
@@ -179,8 +179,8 @@ public class BuildAlert {
                     activity.startActivity(browserIntent);
                     break;
                 }
-                case R.id.view_on_removeddit: {
-                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(finalRemoveddit));
+                case R.id.view_on_unddit: {
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(finalunddit));
                     activity.startActivity(browserIntent);
                     break;
                 }
@@ -252,21 +252,21 @@ public class BuildAlert {
     private AlertDialog.Builder buildSubmission() {
         View dialogToolbar = inflater.inflate(R.layout.alert_toolbar, null);
 
-        String removeddit = intentString;
-        if (removeddit.contains("old.reddit.com")) {
-            removeddit = removeddit.replaceFirst("old[.]", "");
+        String unddit = intentString;
+        if (unddit.contains("old.reddit.com")) {
+            unddit = unddit.replaceFirst("old[.]", "");
         }
-        final String finalRemoveddit = removeddit.replaceFirst("reddit", "removeddit");
+        final String finalunddit = unddit.replaceFirst("reddit", "unddit");
 
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setCustomTitle(dialogToolbar)
-                .setMessage("Submission links are not currently supported.\n\nTap \"Removeddit\" to view the submission on removeddit.com, or try again with a direct link to a comment.")
+                .setMessage("Submission links are not currently supported.\n\nTap \"unddit\" to view the submission on unddit.com, or try again with a direct link to a comment.")
                 .setPositiveButton("OK", (dialog, id) -> {
                     dialog.dismiss();
                     activity.finish();
                 })
-                .setNeutralButton("Removeddit", (dialog, i) -> {
-                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(finalRemoveddit));
+                .setNeutralButton("unddit", (dialog, i) -> {
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(finalunddit));
                     activity.startActivity(browserIntent);
                     dialog.dismiss();
                     activity.finish();
