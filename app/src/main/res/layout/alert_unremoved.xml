@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content">
 
@@ -12,14 +12,16 @@
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_margin="16dp">
+            android:layout_margin="16dp"
+            android:orientation="horizontal">
 
             <TextView
+                android:id="@+id/authorTV"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/authorTV"
-                android:textIsSelectable="true"/>
+                android:text="/u/Test"
+                android:textColor="#fff"
+                android:textIsSelectable="true" />
 
             <View
                 android:layout_width="0dp"
@@ -27,20 +29,24 @@
                 android:layout_weight="1" />
 
             <TextView
+                android:id="@+id/timeTV"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/timeTV"
-                android:textAlignment="viewEnd"
-                android:maxLines="2"/>
+                android:maxLines="2"
+                android:text="0 sec ago"
+                android:textColor="#fff"
+                android:textAlignment="viewEnd" />
 
         </LinearLayout>
 
         <TextView
+            android:id="@+id/bodyTV"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/bodyTV"
             android:layout_margin="16dp"
-            android:textIsSelectable="true"/>
+            android:text="@string/note"
+            android:textColor="#fff"
+            android:textIsSelectable="true" />
 
     </LinearLayout>
 

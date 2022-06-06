@@ -29,12 +29,13 @@
             android:title="@string/view_on_reddit"
             app:showAsAction="never"
             android:orderInCategory="4"/>
-
+        <!--
         <item
             android:id="@+id/view_on_removeddit"
             android:title="@string/view_on_removeddit"
             app:showAsAction="never"
             android:orderInCategory="5"/>
+        -->
     </group>
 
 </menu>

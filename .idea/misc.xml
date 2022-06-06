@@ -1,4 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" project-jdk-name="1.8" project-jdk-type="JavaSDK" />
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="app/src/main/res/drawable/author_background.xml" value="0.2245" />
+        <entry key="app/src/main/res/drawable/bottomsheet_corners_rounded.xml" value="0.2245" />
+        <entry key="app/src/main/res/drawable/bottomsheet_title_spacer.xml" value="0.2245" />
+        <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.303" />
+        <entry key="app/src/main/res/layout/alert_about.xml" value="0.36041666666666666" />
+        <entry key="app/src/main/res/layout/alert_moredetails.xml" value="0.36041666666666666" />
+        <entry key="app/src/main/res/layout/alert_toolbar.xml" value="0.36041666666666666" />
+        <entry key="app/src/main/res/layout/alert_unremoved.xml" value="0.36041666666666666" />
+        <entry key="app/src/main/res/layout/bottomsheet_progress.xml" value="0.36041666666666666" />
+        <entry key="app/src/main/res/layout/bottomsheet_title.xml" value="0.36041666666666666" />
+        <entry key="app/src/main/res/layout/bottomsheet_unremoved_comment.xml" value="0.22509057971014493" />
+        <entry key="app/src/main/res/menu/alert_overflow.xml" value="0.36041666666666666" />
+        <entry key="app/src/main/res/menu/menu_main.xml" value="0.36041666666666666" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK" />
 </project>

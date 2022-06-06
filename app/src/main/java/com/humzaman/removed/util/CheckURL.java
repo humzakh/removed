@@ -10,8 +10,10 @@ public class CheckURL {
     private static final String TAG = "CheckURL";
     private ResultCode resultCode;
 
-    public String check(String intentString) {
+    public String[] check(String intentString) {
         String id = null;
+        String subreddit = null;
+        String link_id = null;
 
         if (URLUtil.isValidUrl(intentString)) {
             Uri validUrl = Uri.parse(intentString);
@@ -28,7 +30,11 @@ public class CheckURL {
                 }
                 else if (pathSegments.size() == 6) { // comment
                     id = pathSegments.get(5);
+                    subreddit = pathSegments.get(1);
+                    link_id = "t3_" + pathSegments.get(3);
                     Log.i(TAG, "Comment ID: " + id);
+                    Log.i(TAG, "Subreddit ID: " + subreddit);
+                    Log.i(TAG, "Link ID: " + link_id);
                     setResultCode(ResultCode.VALID_COMMENT);
                 }
                 else if (pathSegments.get(0).equals("comments")) {
@@ -58,7 +64,7 @@ public class CheckURL {
             setResultCode(ResultCode.NOT_URL);
         }
 
-        return id;
+        return new String[]{id, subreddit, link_id};
     }
 
     public ResultCode getResultCode() {

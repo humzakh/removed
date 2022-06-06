@@ -8,5 +8,6 @@ import retrofit2.http.Query;
 
 public interface PushshiftClient {
     @GET ("/reddit/search/comment")
-    Call<PushshiftDataObject> getCommentData(@Query("ids") String id);
+    Call<PushshiftDataObject> getCommentData(@Query("subreddit") String subreddit, @Query("link_id") String link_id, @Query("id") String id, @Query("size") String size);
+
 }

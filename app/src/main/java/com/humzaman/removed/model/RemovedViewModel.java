@@ -9,5 +9,7 @@ public class RemovedViewModel extends ViewModel {
     public CommentData commentData;
     public String intentString;
     public String id;
+    public String link_id;
+    public String subreddit;
     public Throwable throwable;
 }

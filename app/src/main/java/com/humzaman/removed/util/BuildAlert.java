@@ -179,11 +179,13 @@ public class BuildAlert {
                     activity.startActivity(browserIntent);
                     break;
                 }
+                /*
                 case R.id.view_on_removeddit: {
                     Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(finalRemoveddit));
                     activity.startActivity(browserIntent);
                     break;
                 }
+                */
                 case R.id.more_details: {
                     (new BuildAlert(activity, ResultCode.MORE_DETAILS, intentString, commentData)).build().show();
                     break;
