@@ -5,7 +5,6 @@ __An Android app for quickly viewing [removed] and [deleted] reddit comments.__
 
 Special thanks to: 
 * __Jason Baumgartner__ for creating and maintaining <a href="https://pushshift.io">pushshift.io</a>, the ultimate reddit archive tool.
-* __Jesper Wrang__ for creating <a href="https://removeddit.com">removeddit.com</a>, a web app for viewing removed comments and posts.
 
 ----
 #### Usage:
