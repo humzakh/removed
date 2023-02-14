@@ -167,10 +167,15 @@ public class BuildAlert {
                     activity.finish();
                 });
 
-        String removeddit = intentString;
-        if (removeddit.contains("old.reddit.com"))
-            removeddit = removeddit.replaceFirst("old[.]", "");
-        final String finalRemoveddit = removeddit.replaceFirst("reddit", "removeddit");
+//        String removeddit = intentString;
+//        if (removeddit.contains("old.reddit.com"))
+//            removeddit = removeddit.replaceFirst("old[.]", "");
+//        final String finalRemoveddit = removeddit.replaceFirst("reddit", "removeddit");
+        String unddit = intentString;
+        if (unddit.contains("old.reddit.com"))
+            unddit = unddit.replaceFirst("old[.]", "");
+        final String finalUnddit = unddit.replaceFirst("reddit", "unddit");
+
 
         toolbar.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
@@ -186,6 +191,11 @@ public class BuildAlert {
                     break;
                 }
                 */
+                case R.id.view_on_unddit: {
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(finalUnddit));
+                    activity.startActivity(browserIntent);
+                    break;
+                }
                 case R.id.more_details: {
                     (new BuildAlert(activity, ResultCode.MORE_DETAILS, intentString, commentData)).build().show();
                     break;
