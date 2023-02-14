@@ -33,9 +33,9 @@ public class FetchData {
      * @param id reddit comment id (do not include t1_ prefix)
      */
     //public FetchData(String id) {this.id = id;}
-    public FetchData(String subreddit, String link_id, String id) {
-        this.subreddit = subreddit;
-        this.link_id = link_id;
+    public FetchData(String id) {
+//        this.subreddit = subreddit;
+//        this.link_id = link_id;
         this.id = id;
     }
 
@@ -45,7 +45,7 @@ public class FetchData {
      */
     public void fetch(FetchDataCallback callback) {
         PushshiftClient pushshiftClient = getPushshiftRetrofitInstance().create(PushshiftClient.class);
-        Call<PushshiftDataObject> pushshiftCall = pushshiftClient.getCommentData(subreddit, link_id, id, "100");
+        Call<PushshiftDataObject> pushshiftCall = pushshiftClient.getCommentData(id);
 
         // Execute the call asynchronously. Get a positive or negative callback.
         //noinspection NullableProblems

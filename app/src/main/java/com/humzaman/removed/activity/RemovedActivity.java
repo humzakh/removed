@@ -80,7 +80,7 @@ public class RemovedActivity extends AppCompatActivity implements FetchDataCallb
 
                 if (viewModel.resultCode == ResultCode.VALID_COMMENT) {
                     Log.i(TAG, "initialize: intentString is a valid comment. Fetching data.");
-                    (new FetchData(viewModel.subreddit, viewModel.link_id, viewModel.id)).fetch(this);
+                    (new FetchData(viewModel.id)).fetch(this);
                     showProgressDialog();
                 }
                 else {
@@ -91,7 +91,7 @@ public class RemovedActivity extends AppCompatActivity implements FetchDataCallb
         }
         else if (viewModel.resultCode == ResultCode.VALID_COMMENT) {
             Log.i(TAG, "initialize: Already initialized and checked URL. Fetching data.");
-            (new FetchData(viewModel.subreddit, viewModel.link_id, viewModel.id)).fetch(this);
+            (new FetchData(viewModel.id)).fetch(this);
             showProgressDialog();
         }
         else if (viewModel.intentString != null) {
