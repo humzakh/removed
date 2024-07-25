@@ -22,7 +22,7 @@ import com.humzaman.removed.util.UnremovedBottomSheetDialogFragment;
 
 /*
  * RemovedActivity receives an intent, checks whether the intent is a valid reddit link,
- * then fetches archived comment data from Pushshift.
+ * then fetches archived comment data from PullPush.
 */
 public class RemovedActivity extends AppCompatActivity implements FetchDataCallback {
     private static final String TAG = "RemovedActivity";

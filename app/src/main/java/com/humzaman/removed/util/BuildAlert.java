@@ -78,7 +78,7 @@ public class BuildAlert {
      * @param activity Context to be passed to AlertDialog.Builder
      * @param resultCode Determines which dialog to display.
      * @param intentString Used for removeddit link.
-     * @param commentData Data fetched from Pushshift.
+     * @param commentData Data fetched from PullPush.
      */
     public BuildAlert(Activity activity, ResultCode resultCode, String intentString, CommentData commentData) {
         this.activity = activity;
@@ -140,7 +140,7 @@ public class BuildAlert {
         return alert;
     }
 
-    @SuppressLint("InflateParams")
+    @SuppressLint({"InflateParams", "NonConstantResourceId"})
     private AlertDialog.Builder buildValidComment() {
         View dialogToolbar = inflater.inflate(R.layout.alert_toolbar, null);
         Toolbar toolbar = dialogToolbar.findViewById(R.id.toolbar);
@@ -167,14 +167,10 @@ public class BuildAlert {
                     activity.finish();
                 });
 
-//        String removeddit = intentString;
-//        if (removeddit.contains("old.reddit.com"))
-//            removeddit = removeddit.replaceFirst("old[.]", "");
-//        final String finalRemoveddit = removeddit.replaceFirst("reddit", "removeddit");
-        String unddit = intentString;
-        if (unddit.contains("old.reddit.com"))
-            unddit = unddit.replaceFirst("old[.]", "");
-        final String finalUnddit = unddit.replaceFirst("reddit", "unddit");
+        String undelete = intentString;
+        if (undelete.contains("old.reddit.com"))
+            undelete = undelete.replaceFirst("old[.]", "");
+        final String finalUndelete = undelete.replaceFirst("reddit.com", "undelete.pullpush.io");
 
 
         toolbar.setOnMenuItemClickListener(item -> {
@@ -184,15 +180,8 @@ public class BuildAlert {
                     activity.startActivity(browserIntent);
                     break;
                 }
-                /*
-                case R.id.view_on_removeddit: {
-                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(finalRemoveddit));
-                    activity.startActivity(browserIntent);
-                    break;
-                }
-                */
-                case R.id.view_on_unddit: {
-                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(finalUnddit));
+                case R.id.view_on_undelete: {
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(finalUndelete));
                     activity.startActivity(browserIntent);
                     break;
                 }
@@ -217,14 +206,15 @@ public class BuildAlert {
 
         if (!commentData.getAuthor().equals("[deleted]")) { // open user profile
             authorTV.setMovementMethod(LinkMovementMethod.getInstance());
-            String html = "<a href='https://www.reddit.com/user/" + commentData.getAuthor() + "'>/u/" + commentData.getAuthor() + "</a>";
+            String html = "<a href='https://www.reddit.com/user/" + commentData.getAuthor() + "'>" + commentData.getAuthor() + "</a>";
             authorTV.setText(HtmlCompat.fromHtml(html, HtmlCompat.FROM_HTML_MODE_LEGACY));
         }
         else
             authorTV.setText(R.string.deleted);
 
+        Double created_utc = Double.parseDouble(commentData.getCreated_utc());
         String time = (DateUtils.getRelativeDateTimeString(activity,
-                Long.parseLong(commentData.getCreated_utc()) * 1000,
+                created_utc.longValue() * 1000,
                 DateUtils.MINUTE_IN_MILLIS,
                 DateUtils.DAY_IN_MILLIS,
                 DateUtils.FORMAT_ABBREV_RELATIVE)).toString();
@@ -266,21 +256,21 @@ public class BuildAlert {
     private AlertDialog.Builder buildSubmission() {
         View dialogToolbar = inflater.inflate(R.layout.alert_toolbar, null);
 
-        String removeddit = intentString;
-        if (removeddit.contains("old.reddit.com")) {
-            removeddit = removeddit.replaceFirst("old[.]", "");
+        String undelete = intentString;
+        if (undelete.contains("old.reddit.com")) {
+            undelete = undelete.replaceFirst("old[.]", "");
         }
-        final String finalRemoveddit = removeddit.replaceFirst("reddit", "removeddit");
+        final String finalUndelete = undelete.replaceFirst("reddit.com", "undelete.pullpush.io");
 
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setCustomTitle(dialogToolbar)
-                .setMessage("Submission links are not currently supported.\n\nTap \"Removeddit\" to view the submission on removeddit.com, or try again with a direct link to a comment.")
+                .setMessage("Submission links are not currently supported.\n\nTap \"Undelete\" to view the submission on undelete.pullpush.io, or try again with a direct link to a comment.")
                 .setPositiveButton("OK", (dialog, id) -> {
                     dialog.dismiss();
                     activity.finish();
                 })
-                .setNeutralButton("Removeddit", (dialog, i) -> {
-                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(finalRemoveddit));
+                .setNeutralButton("Undelete", (dialog, i) -> {
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(finalUndelete));
                     activity.startActivity(browserIntent);
                     dialog.dismiss();
                     activity.finish();
@@ -309,13 +299,13 @@ public class BuildAlert {
         @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 
-        String author = (commentData.getAuthor().equals("[deleted]") ? "[deleted]" : "/u/" + commentData.getAuthor());
+        String author = (commentData.getAuthor().equals("[deleted]") ? "[deleted]" : "u/" + commentData.getAuthor());
         String score =  commentData.getScore() + " " + ((Integer.parseInt(commentData.getScore()) == 1) ? "point" : "points");
-        String subreddit = "/r/" + commentData.getSubreddit();
-        String submitted = (commentData.getCreated_utc() == null ? "" : sdf.format(new Date(Long.parseLong(commentData.getCreated_utc()) * 1000)));
-        String archived = (commentData.getRetrieved_on() == null ? "" : sdf.format(new Date(Long.parseLong(commentData.getRetrieved_on()) * 1000)));
+        String subreddit = "r/" + commentData.getSubreddit();
+        Double created_utc =  Double.parseDouble(commentData.getCreated_utc());
+        String submitted = (commentData.getCreated_utc() == null ? "" : sdf.format(new Date(created_utc.longValue() * 1000)));
         String commentID = "t1_" + commentData.getId();
-        String source = "Data source: https://api.pushshift.io/reddit/search/comment/?ids=" + commentData.getId();
+        String source = "Data source: https://api.pullpush.io/reddit/comment/search?ids=" + commentData.getId();
 
         TextView noteTV = dialogView.findViewById(R.id.md_note_tv);
         noteTV.setMovementMethod(LinkMovementMethod.getInstance());
@@ -329,8 +319,6 @@ public class BuildAlert {
 
         TextView submittedTV = dialogView.findViewById(R.id.md_submitted_tv);
         submittedTV.setText(submitted);
-        TextView archivedTV = dialogView.findViewById(R.id.md_archived_tv);
-        archivedTV.setText(archived);
 
         TextView authorIdTV = dialogView.findViewById(R.id.md_authorID_tv);
         authorIdTV.setText(commentData.getAuthor_fullname());
@@ -380,70 +368,34 @@ public class BuildAlert {
                 builder.setMessage("Error: not a valid URL.\n\nPlease share a direct link, not the comment text.");
                 break;
             case FAILED: // failed to retrieve data
-                builder.setMessage("Error: failed to retrieve data from pushshift.io");
+                builder.setMessage("Error: failed to retrieve data from pullpush.io");
                 break;
             case NO_INTERNET: // no internet
                 builder.setMessage("Error: check internet connection.");
                 break;
-            case NO_DATA_FOUND: // no data found on Pushshift
+            case NO_DATA_FOUND: // no data found on PullPush
                 builder.setMessage(R.string.not_archived);
                 break;
             case TIMEOUT:
-                builder.setMessage("Error: connection timed out.\n\nPushshift is taking too long to respond.\nTheir servers may be having some issues.\n\nCheck pushshift.io for updates, or try again later.")
-                       .setNeutralButton("Pushshift.io", (dialog, i) -> {
-                           Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://pushshift.io"));
-                           activity.startActivity(browserIntent);
-                           dialog.dismiss();
-                           activity.finish();
-                       });
+                builder.setMessage("Error: connection timed out.\n\nPullPush is taking too long to respond.\nTheir servers may be having some issues.\n\nTry again later.");
                 break;
-            case PUSHSHIFT_404:
+            case PULLPUSH_404:
                 builder.setMessage("Error 404: not found.");
                 break;
-            case PUSHSHIFT_500:
-                builder.setMessage("Error 500: internal server error.\n\nPushshift's servers seem to be having some issues.\n\nCheck pushshift.io for updates, or try again later.")
-                        .setNeutralButton("Pushshift.io", (dialog, i) -> {
-                            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://pushshift.io"));
-                            activity.startActivity(browserIntent);
-                            dialog.dismiss();
-                            activity.finish();
-                        });
+            case PULLPUSH_500:
+                builder.setMessage("Error 500: internal server error.\n\nPullPush's servers seem to be having some issues.\n\nTry again later.");
                 break;
-            case PUSHSHIFT_502:
-                builder.setMessage("Error 502: bad gateway.\n\nPushshift's servers seem to be having some issues.\n\nCheck pushshift.io for updates, or try again later.")
-                       .setNeutralButton("Pushshift.io", (dialog, i) -> {
-                           Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://pushshift.io"));
-                           activity.startActivity(browserIntent);
-                           dialog.dismiss();
-                           activity.finish();
-                       });
+            case PULLPUSH_502:
+                builder.setMessage("Error 502: bad gateway.\n\nPullPush's servers seem to be having some issues.\n\nTry again later.");
                 break;
-            case PUSHSHIFT_503:
-                builder.setMessage("Error 503: service unavailable.\n\nPushshift's servers seem to be having some issues.\n\nCheck pushshift.io for updates, or try again later.")
-                       .setNeutralButton("Pushshift.io", (dialog, i) -> {
-                           Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://pushshift.io"));
-                           activity.startActivity(browserIntent);
-                           dialog.dismiss();
-                           activity.finish();
-                       });
+            case PULLPUSH_503:
+                builder.setMessage("Error 503: service unavailable.\n\nPullPush's servers seem to be having some issues.\n\nTry again later.");
                 break;
-            case PUSHSHIFT_504:
-                builder.setMessage("Error 504: gateway timeout.\n\nPushshift's servers seem to be having some issues.\n\nCheck pushshift.io for updates, or try again later.")
-                       .setNeutralButton("Pushshift.io", (dialog, i) -> {
-                           Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://pushshift.io"));
-                           activity.startActivity(browserIntent);
-                           dialog.dismiss();
-                           activity.finish();
-                       });
+            case PULLPUSH_504:
+                builder.setMessage("Error 504: gateway timeout.\n\nPullPush's servers seem to be having some issues.\n\nTry again later.");
                 break;
-            case PUSHSHIFT_OTHER:
-                builder.setMessage("Error: unknown server error.\n\nPushshift's servers may be having some issues.\n\nCheck pushshift.io for updates, or try again later.")
-                       .setNeutralButton("Pushshift.io", (dialog, i) -> {
-                           Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://pushshift.io"));
-                           activity.startActivity(browserIntent);
-                           dialog.dismiss();
-                           activity.finish();
-                       });
+            case PULLPUSH_OTHER:
+                builder.setMessage("Error: unknown server error.\n\nPullPush's servers seem to be having some issues.\n\nTry again later.");
                 break;
             default: // invalid link
                 builder.setMessage("Error: invalid link.");

@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
     public void buttonClick(View view) {
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_SEND);
-        intent.putExtra(Intent.EXTRA_TEXT,"https://www.reddit.com/r/removed_test/comments/f3pm08/_/j8gj5ph/");
+        intent.putExtra(Intent.EXTRA_TEXT,"https://reddit.com/r/removed_test/comments/1ebmwfb/_/lettil8/");
         intent.setType("text/plain");
 
         Intent shareIntent = Intent.createChooser(intent, null);

@@ -4,7 +4,7 @@ import android.util.Log;
 
 import com.google.gson.JsonObject;
 import com.humzaman.removed.model.CommentData;
-import com.humzaman.removed.model.PushshiftDataObject;
+import com.humzaman.removed.model.PullPushDataObject;
 import com.humzaman.removed.util.ResultCode;
 
 import java.io.IOException;
@@ -22,14 +22,14 @@ public class FetchData {
     private String subreddit;
     private String link_id;
     private String id;
-    private static Retrofit pushshiftRetrofit;
+    private static Retrofit pullpushRetrofit;
     private static Retrofit redditRetrofit;
     private CommentData commentData;
-    private static final String PUSHSHIFT_BASE = "https://api.pushshift.io";
+    private static final String PULLPUSH_BASE = "https://api.pullpush.io";
     private static final String REDDIT_BASE = "https://api.reddit.com";
 
     /**
-     * Initialize FetchData with the id of the comment to be fetched from Pushshift.
+     * Initialize FetchData with the id of the comment to be fetched from PullPush.
      * @param id reddit comment id (do not include t1_ prefix)
      */
     //public FetchData(String id) {this.id = id;}
@@ -40,23 +40,23 @@ public class FetchData {
     }
 
     /**
-     * Fetch data from Pushshift and reddit (for current score) using Retrofit.
+     * Fetch data from PullPush and reddit (for current score) using Retrofit.
      * @param callback Callback to calling class when Retrofit finishes its job.
      */
     public void fetch(FetchDataCallback callback) {
-        PushshiftClient pushshiftClient = getPushshiftRetrofitInstance().create(PushshiftClient.class);
-        Call<PushshiftDataObject> pushshiftCall = pushshiftClient.getCommentData(id);
+        PullPushClient pullpushClient = getPullPushRetrofitInstance().create(PullPushClient.class);
+        Call<PullPushDataObject> pullpushCall = pullpushClient.getCommentData(id);
 
         // Execute the call asynchronously. Get a positive or negative callback.
         //noinspection NullableProblems
-        pushshiftCall.enqueue(new Callback<PushshiftDataObject>() {
+        pullpushCall.enqueue(new Callback<PullPushDataObject>() {
             @Override
-            public void onResponse(Call<PushshiftDataObject> callP, Response<PushshiftDataObject> responseP) {
+            public void onResponse(Call<PullPushDataObject> callP, Response<PullPushDataObject> responseP) {
                 if (responseP.isSuccessful() && responseP.body() != null) {
                     List<CommentData> commentDataList = responseP.body().getData();
 
-                    if (commentDataList.size() > 0) {
-                        Log.i(TAG, "onResponse: Pushshift " + responseP.code());
+                    if (!commentDataList.isEmpty()) {
+                        Log.i(TAG, "onResponse: PullPush " + responseP.code());
 
                         for(int i = 0; i < commentDataList.size(); i++) { // find the right comment
                             if (commentDataList.get(i).getId().equals(id)) {
@@ -97,7 +97,7 @@ public class FetchData {
                                 }
 
                                 // even if redditCall fails or returns null,
-                                // we'll show the archived score from Pushshift, so we call onSuccess.
+                                // we'll show the archived score from PullPush, so we call onSuccess.
                                 public void onFailure(Call<JsonObject> callR, Throwable throwable) {
                                     Log.e(TAG, "onFailure: ", throwable);
                                     callback.onSuccess(commentData);
@@ -106,41 +106,41 @@ public class FetchData {
                             });
                         }
                     }
-                    else { // comment not archived by Pushshift
+                    else { // comment not archived by PullPush
                         Log.e(TAG, "onResponse: [no archived data found]");
                         callback.onException(ResultCode.NO_DATA_FOUND);
                     }
                 }
-                else { // Pushshift server error codes
-                    Log.e(TAG, "onResponse: Pushshift " + responseP.code());
+                else { // PullPush server error codes
+                    Log.e(TAG, "onResponse: PullPush " + responseP.code());
                     switch (responseP.code()) {
                         case 404:
-                            callback.onException(ResultCode.PUSHSHIFT_404);
+                            callback.onException(ResultCode.PULLPUSH_404);
                             break;
                         case 500:
-                            callback.onException(ResultCode.PUSHSHIFT_500);
+                            callback.onException(ResultCode.PULLPUSH_500);
                             break;
                         case 502:
-                            callback.onException(ResultCode.PUSHSHIFT_502);
+                            callback.onException(ResultCode.PULLPUSH_502);
                             break;
                         case 503:
-                            callback.onException(ResultCode.PUSHSHIFT_503);
+                            callback.onException(ResultCode.PULLPUSH_503);
                             break;
                         case 504:
-                            callback.onException(ResultCode.PUSHSHIFT_504);
+                            callback.onException(ResultCode.PULLPUSH_504);
                             break;
                         default:
-                            callback.onException(ResultCode.PUSHSHIFT_OTHER);
+                            callback.onException(ResultCode.PULLPUSH_OTHER);
                             break;
                     }
                 }
             }
 
             @Override
-            public void onFailure(Call<PushshiftDataObject> call, Throwable throwable) {
+            public void onFailure(Call<PullPushDataObject> call, Throwable throwable) {
                 if (throwable instanceof IOException) {
                     if (Objects.equals(throwable.getMessage(), "timeout")) {
-                        Log.e(TAG, "onFailure: Pushshift timeout", throwable);
+                        Log.e(TAG, "onFailure: PullPush timeout", throwable);
                         callback.onException(ResultCode.TIMEOUT);
                     }
                     else {
@@ -180,14 +180,14 @@ public class FetchData {
     }
      */
 
-    private static Retrofit getPushshiftRetrofitInstance() {
-        if (pushshiftRetrofit == null) {
-            pushshiftRetrofit = new Retrofit.Builder()
-                    .baseUrl(PUSHSHIFT_BASE)
+    private static Retrofit getPullPushRetrofitInstance() {
+        if (pullpushRetrofit == null) {
+            pullpushRetrofit = new Retrofit.Builder()
+                    .baseUrl(PULLPUSH_BASE)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
         }
-        return pushshiftRetrofit;
+        return pullpushRetrofit;
     }
 
     private static Retrofit getRedditRetrofitInstance() {

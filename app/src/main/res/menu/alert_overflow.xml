@@ -31,18 +31,10 @@
             android:orderInCategory="4"/>
 
         <item
-            android:id="@+id/view_on_unddit"
-            android:title="@string/view_on_unddit"
+            android:id="@+id/view_on_undelete"
+            android:title="@string/view_on_undelete"
             app:showAsAction="never"
             android:orderInCategory="5"/>
-
-        <!--
-        <item
-            android:id="@+id/view_on_removeddit"
-            android:title="@string/view_on_removeddit"
-            app:showAsAction="never"
-            android:orderInCategory="5"/>
-        -->
     </group>
 
 </menu>

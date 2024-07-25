@@ -7,21 +7,19 @@ public class CommentData {
     private String id;
     private String permalink;
     private String created_utc;
-    private String retrieved_on;
     private String subreddit;
     private String subreddit_id;
     private String link_id;
     private String parent_id;
     private String author_fullname;
 
-    public CommentData(String author, String body, String score, String id, String permalink, String created_utc, String retrieved_on, String subreddit, String subreddit_id, String link_id, String parent_id, String author_fullname) {
+    public CommentData(String author, String body, String score, String id, String permalink, String created_utc, String subreddit, String subreddit_id, String link_id, String parent_id, String author_fullname) {
         this.author = author;
         this.body = body;
         this.score = score;
         this.id = id;
         this.permalink = permalink;
         this.created_utc = created_utc;
-        this.retrieved_on = retrieved_on;
         this.subreddit = subreddit;
         this.subreddit_id = subreddit_id;
         this.link_id = link_id;
@@ -75,14 +73,6 @@ public class CommentData {
 
     public void setCreated_utc(String created_utc) {
         this.created_utc = created_utc;
-    }
-
-    public String getRetrieved_on() {
-        return retrieved_on;
-    }
-
-    public void setRetrieved_on(String retrieved_on) {
-        this.retrieved_on = retrieved_on;
     }
 
     public String getSubreddit() {

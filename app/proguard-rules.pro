@@ -59,4 +59,14 @@
 -if interface * { @retrofit2.http.* <methods>; }
 -keep,allowobfuscation interface <1>
 
+# Retrofit 2.X
+## https://square.github.io/retrofit/ ##
+-dontwarn retrofit2.**
+-keep class retrofit2.** { *; }
+-keepattributes Signature
+-keepattributes Exceptions
+-keepclasseswithmembers class * {
+    @retrofit2.http.* <methods>;
+}
+
 -keep class com.humzaman.removed.model.** { *; }
